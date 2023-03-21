@@ -1,0 +1,163 @@
+        /* ça ne marche pas le background */
+        body {
+            background-color: F4F4F4;
+        }
+
+        div#dashboard {
+        /*    float: left;
+            position: absolute;
+            width: 1257px;
+            height: 500px;
+            left: 0px;
+            top: 77px;*/
+            background: #F4F4F4;
+            display : flex;
+            flex-direction: column;
+            /*justify-content: center;
+            align-items: center;*/
+            padding: 50px;
+            position : relative;
+            /*border: 2px solid black;
+            box-shadow: 7px 7px 3px #c0c0c0;*/
+
+            font-family: 'Nunito';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 44px;
+        }
+
+        div.block {
+        /*    position: absolute;
+            width: 943px;
+            height: 382px;
+            left: 173px;
+            top: 160px;*/
+
+            background: #FFFFFF;
+            border-radius: 35px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: left;
+            align-items: left;
+            font-family: 'Nunito';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 44px;
+        }
+
+        div.blockGround{
+            padding : 20px;
+            background: #F4F4F4;
+        }
+
+        div.enteteblock{
+            display: flex;
+            flex-direction: row;
+        }
+
+        div.titreblock{
+            font : oblique 18px Arial, Helvetica, sans-serif; 
+            color: black;
+            padding : 20px;
+        }
+
+        div.variable{
+            background: #FFFFFF;
+            border-radius: 72px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        div.titreVar{
+            padding : 10px;
+        }
+
+        h2.titre{
+        /*    position: absolute;
+            left: 0.33%;
+            right: 78.75%;
+            top: 0%;
+            bottom: 62.73%;*/
+
+            font-family: 'Nunito';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 32px;
+            line-height: 44px;
+            padding : 30px;
+
+
+            color: #26394C;
+        }
+        .switch {
+            position: relative;
+            display: inline-blockk;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.moveUp{
+  /* TODO CSS des boutons up/down pour monter/descendre un bloc*/
+}
+
+.moveDown{
+  /* TODO CSS des boutons up/down pour monter/descendre un bloc*/
+}
+
+
+    
