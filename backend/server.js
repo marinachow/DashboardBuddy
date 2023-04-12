@@ -1,13 +1,21 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const session = require("express-session");
 const cors = require("cors");
 app.use(cors({ origin: "*", methods: "GET,HEAD,PUT,PATCH,POST,DELETE"}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(
+	session({
+		secret: "some secret key here",
+		resave: true,
+		saveUninitialized: false, 
+	})
+);
 const pool = require("./db_connection");
 
-app.get('/account/:id', (req, res) => {
+app.get('/user/:id', (req, res) => {
     const accountId = req.params.id;
     const getAccountSql = 'SELECT * FROM account WHERE id = ?';
     pool.query(getAccountSql, accountId, (error, results) => {
@@ -20,7 +28,7 @@ app.get('/account/:id', (req, res) => {
     });
 });
 
-app.post('/account/add', (req, res) => {
+app.post('/user/signup', (req, res) => {
     const { username, password, dashboardList } = req.body;
     const addAccountSql = 'INSERT INTO account (username, password, dashboard_list) VALUES (?, ?, ?)';
     pool.query(addAccountSql, [username, password, JSON.stringify(dashboardList)], (error, results) => {
@@ -31,9 +39,47 @@ app.post('/account/add', (req, res) => {
             res.send({ success: true, account: results[0] });
         }
     });
+    req.session.loggedin = true;
+    req.session.username = username;
+    req.redirect("/");
 });
 
-app.put('/account/edit/:id', (req, res) => {
+app.post('/user/login', (req, res) => {
+    if (req.session.loggedin) {
+		res.status(401).send("Already logged in.");
+	 	return;
+	}
+    const { username, password } = req.body;
+    const getAccountSql = 'SELECT * FROM account WHERE username = ?';
+    pool.query(getAccountSql, username, (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            if (password === results[0].password) {
+                res.send({ success: true, account: results[0] });
+                req.session.loggedin = true;
+		        req.session.username = username;
+		        res.redirect("/");
+            } else {
+                res.status(401).send("Unauthorized, invalid password");
+            }
+        }
+    });
+});
+
+app.post('/user/logout', (req, res) => {
+    if (req.session.loggedin) {
+		req.session.loggedin = false;
+		req.session.username = "";
+		res.redirect("/");
+	} else {
+		res.status(401).send("Not logged in");
+		return;
+	}
+});
+
+app.put('/user/:id', (req, res) => {
     const accountId = req.params.id;
     const { username, password, dashboardList } = req.body;
     const editAccountSql = 'UPDATE account SET username = ?, password = ?, dashboard_list = ? WHERE id = ?';
