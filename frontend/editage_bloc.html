@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Éditeur de Dashboard</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<header>
+		<h1>Editor de bloques</h1>
+	</header>
+	<main>
+		<form id="block-form">
+			<h2>Ajouter un bloc</h2>
+			<label for="block-name">Nom du bloc:</label>
+			<input type="text" id="block-name" name="block-name" required>
+			<label for="block-variables">Variables separadas por coma:</label>
+			<input type="text" id="block-variables" name="block-variables" required>
+			<button type="submit">Ajouter bloc</button>
+		</form>
+		<h2>Bloques existentes</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Nombre</th>
+					<th>Variables</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody id="block-table">
+			</tbody>
+		</table>
+	</main>
+	<script type="text/javascript" src="script.js"></script>
+</body>
+</html>
