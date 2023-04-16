@@ -14,18 +14,72 @@ app.use(
 	})
 );
 const pool = require("./db_connection");
+const path = require("path");
 
-app.get('/user/:id', (req, res) => {
-    const accountId = req.params.id;
-    const getAccountSql = 'SELECT * FROM account WHERE id = ?';
-    pool.query(getAccountSql, accountId, (error, results) => {
-        if (error) {
-            console.log(error);
-            res.send({ success: false });
-        } else {
-            res.send({ success: true, account: results[0] });
-        }
-    });
+// Route handlers
+// Home page
+app.get("/", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/homepage.html");
+    response.status(200).sendFile(filePath);
+});
+// Login page
+app.get("/login", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/login.html");
+    response.status(200).sendFile(filePath);
+});
+// Sign up page
+app.get("/signup", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/signup.html");
+    response.status(200).sendFile(filePath);
+});
+// View dashboard page
+app.get("/myDashboard", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/afficher_dashboard.html");
+    response.status(200).sendFile(filePath);
+});
+// Edit block page
+app.get("/editBlock", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/editage_bloc.html");
+    response.status(200).sendFile(filePath);
+});
+// Edit dashboard page
+app.get("/editDashboard", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/modifier_dashboard.html");
+    response.status(200).sendFile(filePath);
+});
+// CSS
+app.get("/style", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/style.css");
+    response.status(200).sendFile(filePath);
+});
+app.get("/editage", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/editage.css");
+    response.status(200).sendFile(filePath);
+});
+// JS
+app.get("/functions.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/functions.js");
+    response.status(200).sendFile(filePath);
+  });
+  
+app.get("/dashboard.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/dashboard.js");
+    response.status(200).sendFile(filePath);
+});
+app.get("/editage.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/editage.js");
+    response.status(200).sendFile(filePath);
+});
+
+app.get('/user/logout', (req, res) => {
+    if (req.session.loggedin) {
+		req.session.loggedin = false;
+		req.session.username = "";
+		res.redirect("/");
+	} else {
+		res.status(401).send("Not logged in");
+		return;
+	}
 });
 
 app.post('/user/signup', (req, res) => {
@@ -49,34 +103,22 @@ app.post('/user/login', (req, res) => {
 		res.status(401).send("Already logged in.");
 	 	return;
 	}
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     const getAccountSql = 'SELECT * FROM account WHERE username = ?';
-    pool.query(getAccountSql, username, (error, results) => {
+    pool.query(getAccountSql, email, (error, results) => {
         if (error) {
             console.log(error);
             res.send({ success: false });
         } else {
             if (password === results[0].password) {
-                res.send({ success: true, account: results[0] });
                 req.session.loggedin = true;
-		        req.session.username = username;
-		        res.redirect("/");
+		        req.session.username = email;
+                res.redirect("/myDashboard");
             } else {
                 res.status(401).send("Unauthorized, invalid password");
             }
         }
     });
-});
-
-app.post('/user/logout', (req, res) => {
-    if (req.session.loggedin) {
-		req.session.loggedin = false;
-		req.session.username = "";
-		res.redirect("/");
-	} else {
-		res.status(401).send("Not logged in");
-		return;
-	}
 });
 
 app.put('/user/:id', (req, res) => {
@@ -217,4 +259,7 @@ app.put('/variable/edit/:id', (req, res) => {
             res.send({ success: true, variable: results[0] });
         }
     });
+});
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
 });

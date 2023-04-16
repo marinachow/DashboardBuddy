@@ -15,64 +15,63 @@ class Dashboard {
 class block {
 
     constructor(titre, listeVariables, idDashboard, button) {
-      this.id = this.getId();
-      this.titre = titre;
-      this.listeVariables = listeVariables;
-      this.idDashboard = idDashboard;
-      //c'est le bouton qui pourrait permettre de fermer le block dans l'affichage
-      this.button = button;
+		this.id = this.getId();
+		this.titre = titre;
+		this.listeVariables = listeVariables;
+		this.idDashboard = idDashboard;
+		//c'est le bouton qui pourrait permettre de fermer le block dans l'affichage
+		this.button = button;
     }
 
     getId(){
       //TODO aller chercher dans la BDD l'id du block
-        }
+    }
 
     build(div, mode) {
-      
-      //blockground (div qui contient le block et son entête)
-      let blockGround = document.createElement('div');
-      blockGround.className = "blockGround";
-      div.appendChild(blockGround);
+		//blockground (div qui contient le block et son entête)
+		let blockGround = document.createElement('div');
+		blockGround.className = "blockGround";
+		div.appendChild(blockGround);
 
-      //entête (qui contient le titre et éventuellement les boutons d'édition ou d'affichage du block)
-      let entete = document.createElement('div');
-      entete.className= "enteteblock";
-      blockGround.appendChild(entete);
+		//entête (qui contient le titre et éventuellement les boutons d'édition ou d'affichage du block)
+		let entete = document.createElement('div');
+		entete.className= "enteteblock";
+		blockGround.appendChild(entete);
 
-      //titre 
-      let titreblock = document.createElement('div');
-      titreblock.className = "titreblock";
-      titreblock.innerHTML = this.titre;
-      entete.appendChild(titreblock);
+		//titre 
+		let titreblock = document.createElement('div');
+		titreblock.className = "titreblock";
+		titreblock.innerHTML = this.titre;
+		entete.appendChild(titreblock);
 
-      // boutons d'édition
-      if (mode == "edit"){
-        const buttonUp = document.createElement('button');
-        buttonUp.className = "moveUp";
-        //enlever le mode commentaire quand la méthode moveBlockUp est écrite
-        //buttonUp.onclick= moveblockUp (this.getDashboardId(), this.getId());
-        const buttonDown = document.createElement('button');
-        buttonDown.className = "moveUp";
-        //enlever le mode commentaire quand la méthode moveBlockDown est écrite
-        //buttonDown.onclick= moveblockDown (getDashboardId(this), getId(this));
-        entete.appendChild(buttonUp); 
-        entete.appendChild(buttonDown);
-      }
+		// boutons d'édition
+		if (mode == "edit"){
+		const buttonUp = document.createElement('button');
+		buttonUp.className = "moveUp";
+		//enlever le mode commentaire quand la méthode moveBlockUp est écrite
+		//buttonUp.onclick= moveblockUp (this.getDashboardId(), this.getId());
+		const buttonDown = document.createElement('button');
+		buttonDown.className = "moveUp";
+		//enlever le mode commentaire quand la méthode moveBlockDown est écrite
+		//buttonDown.onclick= moveblockDown (getDashboardId(this), getId(this));
+		entete.appendChild(buttonUp); 
+		entete.appendChild(buttonDown);
+		}
 
-      //block
-      let elem = document.createElement('div');
-      elem.className = "block";
-      elem.id = `block1`;
-      blockGround.appendChild(elem);
+		//block
+		let elem = document.createElement('div');
+		elem.className = "block";
+		elem.id = `block1`;
+		blockGround.appendChild(elem);
 
-      //TODO ajouter le bouton qui permet d'ouvrir ou fermer le contenu
+		//TODO ajouter le bouton qui permet d'ouvrir ou fermer le contenu
 
-      for (let i = 0 ; i < this.listeVariables.length ; i++) {
-        let variable = this.listeVariables[i];
-        variable.build(elem);
-    };
+		for (let i = 0 ; i < this.listeVariables.length ; i++) {
+			let variable = this.listeVariables[i];
+			variable.build(elem);
+		};
     }
-  };
+};
 
   class variable {
 
