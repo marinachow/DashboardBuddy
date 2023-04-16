@@ -4,14 +4,14 @@ const loadDashboard = function (id){
     if (id == undefined){
         //block1
         let titre1 = "Message d'accueil" ;
-        let variable1 = new variable ("Activer le message :","button","0");
-        let variable2 = new variable ("Contenu du message","texte", "Bonjour");
+        let variable1 = new variable (0, "Activer le message :","button","0", 0, 0);
+        let variable2 = new variable (1, "Contenu du message","texte", "Bonjour", 0, 1);
         let listeVar = [variable1, variable2];
         let block1 = new block(titre1, listeVar);
         //block2
         let titre2 = "Horaire du standard" ;
-        let variable3 = new variable ("Fermeture : ","texte","17h");
-        let variable4 = new variable ("Ouverture : ", "texte", "8h");
+        let variable3 = new variable (2, "Fermeture : ","texte","17h", 1, 0);
+        let variable4 = new variable (3, "Ouverture : ", "texte", "8h", 1, 1);
         let listeVar2 = [variable4, variable3];
         let block2 = new block(titre2, listeVar2);
         
@@ -36,7 +36,7 @@ const buttonClicked = function (titre) {
   };
 
 function dragAndDrop() {
-    const blocks = document.querySelectorAll('.block');
+    const blocks = document.querySelectorAll('.blockGround');
     let dragStartIndex;
     let dragEndIndex;
     blocks.forEach((block, index) => {
@@ -65,5 +65,19 @@ function dragAndDrop() {
         blocks[start].innerHTML = blocks[end].innerHTML;
         blocks[end].innerHTML = temp;
         blocks[start].classList.remove('drag-over');
+
+        // Update block order
+        const blockIds = Array.from(blocks, (block) => block.dataset.id);
+        const movedBlockId = blockIds.splice(start, 1)[0];
+        blockIds.splice(end, 0, movedBlockId);
+
+        // Update block order in database
+        axios.put(`http://localhost:3000/dashboard/edit/${dashboardId}`, { blockList: blockIds })
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     }
 }

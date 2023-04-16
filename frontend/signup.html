@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Login DB</title>
+    <title>Sign up DB</title>
     <link href="https://fonts.googleapis.com/css?family=SF+Pro&display=swap" rel="stylesheet">
     <style>
       body {
@@ -61,14 +61,35 @@
   </head>
   <body>
     <div class="login">
-      <h1>Log in</h1>
-      <form action="/user/login" method="post">
+      <h1>Sign up</h1>
+      <form action="/user/signup" method="post">
         <label for="email">Mail</label>
         <input type="email" id="email" name="email" placeholder="Entrez votre email" required>
-        <label for="password">Mot de passe</label>
+      
+        <label for="password1">Mot de passe</label>
         <input type="password" id="password" name="password" placeholder="Ne le partagez pas!" required>
-        <button type="submit">Login</button>
+      
+        <label for="password2">Confirmer le mot de passe</label>
+        <input type="password" id="password2" name="password2" placeholder="Entrez votre mot de passe à nouveau" required>
+      
+        <button type="submit" id="signup-btn" disabled>Sign up</button>
       </form>
+      
+      <script>
+        // get the password input elements
+        const password1Input = document.getElementById("password");
+        const password2Input = document.getElementById("password2");
+      
+        // add an event listener to check if passwords match
+        password2Input.addEventListener("input", function() {
+          if (password1Input.value === password2Input.value) {
+            document.getElementById("signup-btn").disabled = false;
+          } else {
+            document.getElementById("signup-btn").disabled = true;
+          }
+        });
+      </script>
+      
     </div>
   </body>
 </html>

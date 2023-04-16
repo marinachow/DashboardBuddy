@@ -44,25 +44,16 @@ class block {
 		titreblock.innerHTML = this.titre;
 		entete.appendChild(titreblock);
 
-		// boutons d'édition
-		if (mode == "edit"){
-		const buttonUp = document.createElement('button');
-		buttonUp.className = "moveUp";
-		//enlever le mode commentaire quand la méthode moveBlockUp est écrite
-		//buttonUp.onclick= moveblockUp (this.getDashboardId(), this.getId());
-		const buttonDown = document.createElement('button');
-		buttonDown.className = "moveUp";
-		//enlever le mode commentaire quand la méthode moveBlockDown est écrite
-		//buttonDown.onclick= moveblockDown (getDashboardId(this), getId(this));
-		entete.appendChild(buttonUp); 
-		entete.appendChild(buttonDown);
-		}
-
 		//block
 		let elem = document.createElement('div');
 		elem.className = "block";
 		elem.id = `block1`;
 		blockGround.appendChild(elem);
+
+		// boutons d'édition
+		if (mode == "edit"){
+
+		}
 
 		//TODO ajouter le bouton qui permet d'ouvrir ou fermer le contenu
 
@@ -73,59 +64,58 @@ class block {
     }
 };
 
-  class variable {
-
-    constructor(titre, type, value) {
-      this.titre = titre;
-      this.type = type;
-      this.value = value;
+class variable {
+    constructor(id, titre, type, value, blockId) {
+		this.id = id;
+      	this.titre = titre;
+		this.type = type;
+		this.value = value;
+		this.blockId = blockId;
     }
 
     build(div) {
-      //conteneur "variable"
-      let conteneur = document.createElement('div');
-      conteneur.className = "variable";
-      conteneur.id = `var1`;
-      div.appendChild(conteneur);
+		//conteneur "variable"
+		let conteneur = document.createElement('div');
+		conteneur.className = "variable";
+		conteneur.id = `var1`;
+		div.appendChild(conteneur);
 
-      //titre de la variable
-      let titre = document.createElement('div');
-      titre.innerHTML= this.titre;
-      titre.className = "titreVar"
-      conteneur.appendChild(titre);
-      
-      //input de la variable (selon le type : zone de texte ou bouton)
-      let input;
-      if (this.type == "texte"){
-        input = document.createElement('input');
-        input.type = "text";
-        input.className = "inputVar";
-        input.value = this.value;
-      } 
-      if (this.type=="button") {
-        input = document.createElement('label');
-        input.className = "switch";
-        let input2 = document.createElement('input');
-        input2.type = "checkbox";
-        let span = document.createElement('span');
-        span.className = "slider round";
-        input.appendChild(input2);
-        input.appendChild(span);
+		//titre de la variable
+		let titre = document.createElement('div');
+		titre.innerHTML= this.titre;
+		titre.className = "titreVar"
+		conteneur.appendChild(titre);
+		
+		//input de la variable (selon le type : zone de texte ou bouton)
+		let input;
+		if (this.type == "texte"){
+			input = document.createElement('input');
+			input.type = "text";
+			input.className = "inputVar";
+			input.value = this.value;
+      	} 
+      	if (this.type=="button") {
+			input = document.createElement('label');
+			input.className = "switch";
+			let input2 = document.createElement('input');
+			input2.type = "checkbox";
+			let span = document.createElement('span');
+			span.className = "slider round";
+			input.appendChild(input2);
+			input.appendChild(span);
 
-        //onclick action
-        input.onclick = buttonClicked(this.titre);
-        
-        if (this.value == "1"){
-          input.checked= true;
-        }
-      }
-      else { //TODO si la variable n'a pas de type texte ou button
-        input.innerHTML= "<input/>";
-        input.className = "inputVar";
-      }
+			//onclick action
+			input.onclick = buttonClicked(this.titre);
+			
+			if (this.value == "1"){
+				input.checked= true;
+			}
+      	} else { //TODO si la variable n'a pas de type texte ou button
+			input.innerHTML= "<input/>";
+			input.className = "inputVar";
+      	}
+      	conteneur.appendChild(input);
 
-      conteneur.appendChild(input);
-
-    }
-  }
+    	}
+}
   

@@ -4,10 +4,16 @@
 	<meta charset="UTF-8">
 	<title>Éditeur de Dashboard</title>
     <link rel="stylesheet" href="/editage">
+	<link rel="stylesheet" href="/header">
 </head>
 <body>
 	<header>
-		<h1>Éditeur de blocs</h1>
+		<h1>Dashboard Buddy</h1>
+		<div class="user-button">
+			<form action="/user/logout" method="get">
+				<button class="user" type="submit">Log out</button>
+			</form>
+		</div>
 	</header>
 	<main>
 		<form id="block-form">

@@ -16,6 +16,15 @@ app.use(
 const pool = require("./db_connection");
 const path = require("path");
 
+// Define middleware to check whether user is authenticated
+const requireAuth = (req, res, next) => {
+    if (req.session.loggedin) {
+      next(); // User is authenticated, so proceed to the next middleware/route handler
+    } else {
+      res.redirect('/login'); // User is not authenticated, so redirect to login page
+    }
+  };
+
 // Route handlers
 // Home page
 app.get("/", (request, response) => {
@@ -32,18 +41,20 @@ app.get("/signup", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/signup.html");
     response.status(200).sendFile(filePath);
 });
+
+// Restricted pages that require authentication
 // View dashboard page
-app.get("/myDashboard", (request, response) => {
+app.get("/myDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/afficher_dashboard.html");
     response.status(200).sendFile(filePath);
 });
 // Edit block page
-app.get("/editBlock", (request, response) => {
+app.get("/editBlock", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/editage_bloc.html");
     response.status(200).sendFile(filePath);
 });
 // Edit dashboard page
-app.get("/editDashboard", (request, response) => {
+app.get("/editDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/modifier_dashboard.html");
     response.status(200).sendFile(filePath);
 });
@@ -54,6 +65,10 @@ app.get("/style", (request, response) => {
 });
 app.get("/editage", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/editage.css");
+    response.status(200).sendFile(filePath);
+});
+app.get("/header", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/header.css");
     response.status(200).sendFile(filePath);
 });
 // JS
@@ -83,19 +98,18 @@ app.get('/user/logout', (req, res) => {
 });
 
 app.post('/user/signup', (req, res) => {
-    const { username, password, dashboardList } = req.body;
-    const addAccountSql = 'INSERT INTO account (username, password, dashboard_list) VALUES (?, ?, ?)';
-    pool.query(addAccountSql, [username, password, JSON.stringify(dashboardList)], (error, results) => {
+    const { email, password } = req.body;
+    const addAccountSql = 'INSERT INTO account (username, password) VALUES (?, ?)';
+    pool.query(addAccountSql, [email, password], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
         } else {
-            res.send({ success: true, account: results[0] });
+            req.session.loggedin = true;
+            req.session.username = email;
+            res.redirect("/myDashboard");
         }
     });
-    req.session.loggedin = true;
-    req.session.username = username;
-    req.redirect("/");
 });
 
 app.post('/user/login', (req, res) => {
@@ -193,9 +207,9 @@ app.get('/block/:id', (req, res) => {
   });
   
 app.post('/block/add', (req, res) => {
-	const { title, dashboardId, ordinal, variableList } = req.body;
-	const addBlockSql = 'INSERT INTO block (title, dashboard_id, ordinal, variable_list) VALUES (?, ?, ?, ?)';
-	pool.query(addBlockSql, [title, dashboardId, ordinal, JSON.stringify(variableList)], (error, results) => {
+	const { title, dashboardId, variableList } = req.body;
+	const addBlockSql = 'INSERT INTO block (title, dashboard_id, variable_list) VALUES (?, ?, ?)';
+	pool.query(addBlockSql, [title, dashboardId, JSON.stringify(variableList)], (error, results) => {
 		if (error) {
 		console.log(error);
 		res.send({success : false});
@@ -207,9 +221,9 @@ app.post('/block/add', (req, res) => {
 
 app.put('/block/edit/:id', (req, res) => {
 	const blockId = req.params.id;
-	const { title, dashboardId, ordinal, variableList } = req.body;
-	const editBlockSql = 'UPDATE block SET title = ?, dashboard_id = ?, ordinal = ?, variable_list = ? WHERE id = ?';
-	pool.query(editBlockSql, [title, dashboardId, ordinal, JSON.stringify(variableList), blockId], (error, results) => {
+	const { title, dashboardId, variableList } = req.body;
+	const editBlockSql = 'UPDATE block SET title = ?, dashboard_id = ?, variable_list = ? WHERE id = ?';
+	pool.query(editBlockSql, [title, dashboardId, JSON.stringify(variableList), blockId], (error, results) => {
 	  if (error) {
 		console.log(error);
 		res.send({success : false});
@@ -234,9 +248,9 @@ app.get('/variable/:id', (req, res) => {
 });
 
 app.post('/variable/add', (req, res) => {
-    const { name, description, type, value, blockId, ordinal } = req.body;
-    const addVariableSql = 'INSERT INTO variable (name, description, type, value, block_id, ordinal) VALUES (?, ?, ?, ?, ?, ?)';
-    pool.query(addVariableSql, [name, description, type, value, blockId, ordinal], (error, results) => {
+    const { name, description, type, value, blockId} = req.body;
+    const addVariableSql = 'INSERT INTO variable (name, description, type, value, block_id) VALUES (?, ?, ?, ?, ?, ?)';
+    pool.query(addVariableSql, [name, description, type, value, blockId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
@@ -248,9 +262,9 @@ app.post('/variable/add', (req, res) => {
 
 app.put('/variable/edit/:id', (req, res) => {
     const variableId = req.params.id;
-    const { name, description, type, value, blockId, ordinal } = req.body;
-    const editVariableSql = 'UPDATE variable SET name = ?, description = ?, type = ?, value = ?, block_id = ?, ordinal = ? WHERE id = ?';
-    pool.query(editVariableSql, [name, description, type, value, blockId, ordinal, variableId], (error, results) => {
+    const { name, description, type, value, blockId } = req.body;
+    const editVariableSql = 'UPDATE variable SET name = ?, description = ?, type = ?, value = ?, block_id = ? WHERE id = ?';
+    pool.query(editVariableSql, [name, description, type, value, blockId, variableId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
