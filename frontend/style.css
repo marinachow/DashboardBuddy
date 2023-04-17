@@ -33,16 +33,18 @@ div.block {
   line-height: 44px;
 }
 
-div.blockGround{
-  padding : 20px;
+.blockGround .edit-blockGround{
   background: #F4F4F4;
+}
+
+.edit-blockGround {
   cursor: move;
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
 }
 
-.blockGround:active {
+.edit-blockGround:active {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
@@ -69,6 +71,29 @@ div.variable{
 div.titreVar{
   padding : 10px;
 }
+.second-header{
+  display: flex;
+  align-items: center;
+}
+
+button {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+.add-button {
+  padding: 5px 10px;
+}
 
 h2{
   font-family: 'Nunito';
@@ -76,9 +101,14 @@ h2{
   font-weight: 700;
   font-size: 32px;
   line-height: 44px;
-  padding: 30px 30px 0 30px;
+  padding: 0px 30px 0 30px;
   color: #26394C;
 }
+
+.block-form {
+  padding: 0px 30px 0 30px;
+}
+
 .drag-instructions {
   padding : 0px 30px 0px 30px;
   font-family: 'Nunito';
@@ -135,7 +165,6 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-/* Rounded sliders */
 .slider.round {
   border-radius: 34px;
 }
@@ -143,6 +172,3 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
-
-    

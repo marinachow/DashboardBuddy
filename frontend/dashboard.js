@@ -30,7 +30,11 @@ class block {
     build(div, mode) {
 		//blockground (div qui contient le block et son entête)
 		let blockGround = document.createElement('div');
-		blockGround.className = "blockGround";
+		if (mode == "edit"){
+			blockGround.className = "edit-blockGround";
+		} else {
+			blockGround.className = "blockGround";
+		}
 		div.appendChild(blockGround);
 
 		//entête (qui contient le titre et éventuellement les boutons d'édition ou d'affichage du block)
@@ -48,12 +52,7 @@ class block {
 		let elem = document.createElement('div');
 		elem.className = "block";
 		elem.id = `block1`;
-		blockGround.appendChild(elem);
-
-		// boutons d'édition
-		if (mode == "edit"){
-
-		}
+		blockGround.appendChild(elem);		
 
 		//TODO ajouter le bouton qui permet d'ouvrir ou fermer le contenu
 

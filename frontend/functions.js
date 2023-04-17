@@ -1,4 +1,4 @@
-const loadDashboard = function (id){
+async function loadDashboard(id) {
     // TODO récupérer les listes de blocks et de variables depuis la BDD à partir de l'ID du dashboard
     
     if (id == undefined){
@@ -19,6 +19,32 @@ const loadDashboard = function (id){
         let listeblock = [block1, block2];
         return listeblock;
     }
+    try {
+        const response = await axios.get(`http://localhost:3000/dashboard/${id}`);
+        const dashboard = response.data.dashboard;
+        const blockIds = dashboard.block_list;
+        const blockList = [];
+    
+        for (let i = 0; i < blockIds.length; i++) {
+          const blockResponse = await axios.get(`http://localhost:3000/block/${blockIds[i]}`);
+          const blockRes = blockResponse.data.block;
+          const variableIds = blockRes.variable_list;
+          const variableList = [];
+    
+          for (let j = 0; j < variableIds.length; j++) {
+            const variableResponse = await axios.get(`http://localhost:3000/variable/${variableIds[j]}`);
+            const variableRes = variableResponse.data.variable;
+            variableList.push(new variable(variableRes.id, variableRes.name, variableRes.type, variableRes.value, variableRes.block_id));
+          }
+    
+          blockList[i] = new block(blockRes.title, variableList, blockRes.dashboard_id);
+        }
+        
+        return blockList;
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 //TODO écrire la fonction onclick du bouton qui permet de monter un bloc au-dessus d'un autre dans la page d'édition du dashboard
@@ -36,7 +62,7 @@ const buttonClicked = function (titre) {
   };
 
 function dragAndDrop() {
-    const blocks = document.querySelectorAll('.blockGround');
+    const blocks = document.querySelectorAll('.edit-blockGround');
     let dragStartIndex;
     let dragEndIndex;
     blocks.forEach((block, index) => {
@@ -72,7 +98,7 @@ function dragAndDrop() {
         blockIds.splice(end, 0, movedBlockId);
 
         // Update block order in database
-        axios.put(`http://localhost:3000/dashboard/edit/${dashboardId}`, { blockList: blockIds })
+        axios.put(`http://localhost:3000/dashboard/updateBlockOrder/${dashboardId}`, { blockList: blockIds })
         .then((res) => {
             console.log(res.data);
         })

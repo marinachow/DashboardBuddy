@@ -7,19 +7,27 @@
     <link rel="stylesheet" href="/header">
     <script src="functions.js" type="text/javascript"></script>
     <script src="dashboard.js" type="text/javascript"></script>        
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        // récupération du dashboard 
-        let listeblock = loadDashboard();
-
-        //affichage des blocks au chargement de la page
-        window.onload = function() {
+        async function loadAllDashboards() {
+            const response = await axios.get('http://localhost:3000/user/dashboardList');
+            let dashboardList = response.data.dashboardList;
+            let blockList = [];
+            for (let i = 0; i < dashboardList.length; i++) {
+                blockList = await loadDashboard(dashboardList[i]);
+            }
+            console.log(blockList);
             let div = document.getElementById('dashboard');
-            for (let i =0; i < listeblock.length;i++){
-                let block = listeblock[i];
+            for (let i = 0; i < blockList.length; i++) {
+                let block = blockList[i];
                 block.build(div);
             }
-        };
+        }
+
+        loadAllDashboards();
+
     </script>
+
 </head>
 <body>
     <header>
@@ -30,7 +38,10 @@
             </form>
         </div>
     </header>
-    <h2>My Dashboard</h2>
+    <div class="second-header">
+        <h2>My Dashboard</h2>
+        <button onclick="window.location.href='/editDashboard'">Edit</button>
+    </div>
     <div id="dashboard"></div>
 </body>
 </html>
