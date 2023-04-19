@@ -19,7 +19,7 @@ dashboardForm.addEventListener('submit', (event) => {
     })
     .then((res) => {
         console.log("Dashboard created");
-        window.location.href = '/myDashboard?id=' + res.data.dashboardId;
+        window.location.href = '/createBlock?id=' + res.data.dashboardId;
     })
     .catch((err) => {
         console.error(err);

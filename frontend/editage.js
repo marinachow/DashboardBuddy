@@ -2,12 +2,14 @@
 const blockForm = document.getElementById('block-form');
 const variablesForm = document.getElementById('variables-form');
 const numVariablesInput = document.getElementById('block-variables');
+const createButton = document.getElementById('create-button');
 
 // Listen for click on "Add Variables" button
 numVariablesInput.addEventListener('change', () => {
     // Get number of variables input value
     const numVariables = parseInt(document.getElementById('block-variables').value);
 	variablesForm.innerHTML = '';
+    createButton.innerHTML = '';
     // Create input fields for each variable
     for (let i = 1; i <= numVariables; i++) {
         const inputContainer = document.createElement('div');
@@ -55,6 +57,11 @@ numVariablesInput.addEventListener('change', () => {
 		inputContainer.appendChild(document.createElement("br"));
         variablesForm.appendChild(inputContainer);
     }
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.classList.add("add-button");
+    button.textContent = "Create Block";
+    createButton.appendChild(button);
 });
 
 // Listen for form submission
@@ -98,6 +105,7 @@ blockForm.addEventListener('submit', async (event) => {
             });
             console.log('Variable added to block');
         }
+        location.reload();
     } catch (error) {
         console.error(error);
     }
