@@ -8,24 +8,10 @@
 	<script src="functions.js" type="text/javascript"></script>
 	<script src="dashboard.js" type="text/javascript"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  
 	<script>
-        async function loadAllDashboards() {
-            const response = await axios.get('http://localhost:3000/user/dashboardList');
-            let dashboardList = response.data.dashboardList;
-            let blockList = [];
-            for (let i = 0; i < dashboardList.length; i++) {
-                blockList = await loadDashboard(dashboardList[i]);
-            }
-            console.log(blockList);
-            let div = document.getElementById('dashboard');
-            for (let i = 0; i < blockList.length; i++) {
-                let block = blockList[i];
-                block.build(div);
-            }
-        }
-
-        loadAllDashboards();
+        const params = new URLSearchParams(window.location.search);
+        window.id = params.get('id');
+        loadDashboard(id);
     </script>
 </head>
 <body>
@@ -51,13 +37,15 @@
 		<br>
 		<div id="variables-form"></div>
 		<br>
-		<button type="submit" class="add-button" disabled>Create Block</button>
+		<button type="submit" class="add-button">Create Block</button>
 	</form>
 	<div class="second-header">
 		<h2>Block List</h2>
-		<button onclick="window.location.href='/editDashboard'">Edit</button>
+		<button onclick="window.location.href=`/editDashboard?id=${window.id}`">Edit</button>
 	</div>
-    <div id="dashboard"></div>
+    <div id = "dashboard-container">
+        <div id="dashboard" class="dashboard"></div>
+    </div>
 	<script src="editage.js" type="text/javascript" ></script>
 </body>
 </html>

@@ -58,45 +58,47 @@ numVariablesInput.addEventListener('change', () => {
 });
 
 // Listen for form submission
-blockForm.addEventListener('submit', (event) => {
+blockForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    
+    let dashboardId = window.id;
     // Get form values
     const blockName = document.getElementById('block-name').value;
     const numVariables = parseInt(document.getElementById('block-variables').value);
-    for (let i = 1; i <= numVariables; i++) {
-        const variableName = document.getElementsByName(`variable-${i}-name`)[0].value;
-        const variableType = document.getElementsByName(`variable-${i}-type`)[0].value;
-        const variableValue = document.getElementsByName(`variable-${i}-value`)[0].value;
-		axios.post('http://localhost:3000/variable/add', {
-			name: variableName,
-			type: variableType,
-			value: variableValue
-		})
-		.then((res) => {
-			console.log('Variable added:', res.data);
-		})
-		.catch((err) => {
-			console.log(err);
-		});
-	}
-	axios.post('http://localhost:3000/block/add', {
-		title: blockName,
-		variables: numVariables
-		})
-		.then((res) => {
-		const newBlockId = res.data.blockId;
-			axios.put(`http://localhost:3000/dashboard/addBlock/${dashboardId}`, {
-				blockId: newBlockId
-			})
-			.then((res) => {
-				console.log('Block added to dashboard:', res.data);
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-		})
-		.catch((err) => {
-			console.error(err);
-		});
+    let newBlockId;
+
+    try {
+        const blockResponse = await axios.post('http://localhost:3000/block/add', {
+            title: blockName,
+			dashboardId: dashboardId
+        });
+        console.log('Block added');
+        newBlockId = blockResponse.data.blockId;
+
+        await axios.put(`http://localhost:3000/dashboard/addBlock/${dashboardId}`, {
+            blockId: newBlockId
+        });
+        console.log('Block added to dashboard');
+
+        for (let i = 1; i <= numVariables; i++) {
+            const variableName = document.getElementsByName(`variable-${i}-name`)[0].value;
+            const variableType = document.getElementsByName(`variable-${i}-type`)[0].value;
+            const variableValue = document.getElementsByName(`variable-${i}-value`)[0].value;
+
+            const variableResponse = await axios.post('http://localhost:3000/variable/add', {
+                name: variableName,
+                type: variableType,
+                value: variableValue,
+                blockId: newBlockId
+            });
+            console.log('Variable added');
+            newVariableId = variableResponse.data.variableId;
+
+            await axios.put(`http://localhost:3000/block/addVariable/${newBlockId}`, {
+                variableId: newVariableId
+            });
+            console.log('Variable added to block');
+        }
+    } catch (error) {
+        console.error(error);
+    }
 });

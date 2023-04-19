@@ -6,16 +6,12 @@ class Dashboard {
     this.idAccount = idAccount;
   }
 
-  getId(){
-    //TODO
-  }
-
 }
 
-class block {
+class Block {
 
-    constructor(titre, listeVariables, idDashboard, button) {
-		this.id = this.getId();
+    constructor(id, titre, listeVariables, idDashboard, button) {
+		this.id = id;
 		this.titre = titre;
 		this.listeVariables = listeVariables;
 		this.idDashboard = idDashboard;
@@ -23,15 +19,12 @@ class block {
 		this.button = button;
     }
 
-    getId(){
-      //TODO aller chercher dans la BDD l'id du block
-    }
-
     build(div, mode) {
 		//blockground (div qui contient le block et son entête)
 		let blockGround = document.createElement('div');
 		if (mode == "edit"){
 			blockGround.className = "edit-blockGround";
+			blockGround.dataset.id = this.id;
 		} else {
 			blockGround.className = "blockGround";
 		}
@@ -63,7 +56,7 @@ class block {
     }
 };
 
-class variable {
+class Variable {
     constructor(id, titre, type, value, blockId) {
 		this.id = id;
       	this.titre = titre;
@@ -87,7 +80,7 @@ class variable {
 		
 		//input de la variable (selon le type : zone de texte ou bouton)
 		let input;
-		if (this.type == "texte"){
+		if (this.type == "text"){
 			input = document.createElement('input');
 			input.type = "text";
 			input.className = "inputVar";
@@ -117,4 +110,5 @@ class variable {
 
     	}
 }
-  
+module.exports = { Block, Variable };
+ 

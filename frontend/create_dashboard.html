@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Create Dashboard</title>
+	<link rel="stylesheet" href="/create">
+	<link rel="stylesheet" href="/header">
+	<link rel="stylesheet" href="/style">
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<header>
+		<h1>Dashboard Buddy</h1>
+		<div class="user-button">
+			<form action="/user/logout" method="get">
+				<button class="user" type="submit">Log out</button>
+			</form>
+		</div>
+	</header>
+	<div class="second-header">
+		<h2>Create Dashboard</h2>
+	</div>
+	<form id="dashboard-form">
+		<div>
+			<label for="dashboard-name">Name of Dashboard:</label>
+			<input type="text" id="dashboard-name" name="dashboard-name" required>
+		</div>
+		<br>
+		<div>
+			<label for="dashboard-description">Description:</label>
+			<textarea id="dashboard-description" name="dashboard-description"></textarea>
+		</div>
+		<br>
+		<button type="submit" class="add-button">Create Dashboard</button>
+	</form>
+	<script src="create_dashboard.js" type="text/javascript"></script>
+</body>
+</html>
+

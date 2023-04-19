@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard List</title>
+    <link rel="stylesheet" href="/style">
+    <link rel="stylesheet" href="/header">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>  
+    <script>
+        // retrieve dashboard list from backend
+        axios.get('http://localhost:3000/user/dashboardList')
+        .then(response => {
+            const dashboardList = response.data.dashboardList;
+            const dashboardListElement = document.getElementById('dashboard-list');
+            
+            // create list items for each dashboard
+            dashboardList.forEach(dashboardId => {
+                const dashboardListItem = document.createElement('li');
+                const dashboardLink = document.createElement('a');
+                dashboardLink.textContent = `Dashboard ${dashboardId}`;
+                dashboardLink.href = `/myDashboard?id=${dashboardId}`;
+                dashboardListItem.appendChild(dashboardLink);
+                dashboardListElement.appendChild(dashboardListItem);
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Dashboard Buddy</h1>
+        <div class="user-button">
+            <form action="/user/logout" method="get">
+                <button class="user" type="submit">Log out</button>
+            </form>
+        </div>
+    </header>
+    <div class="second-header">
+        <h2>Dashboard List</h2>
+    </div>
+    <ul id="dashboard-list"></ul>
+</body>
+</html>

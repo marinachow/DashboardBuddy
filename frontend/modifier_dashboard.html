@@ -14,22 +14,9 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <script>
-    
-     async function loadAllDashboards() {
-            const response = await axios.get('http://localhost:3000/user/dashboardList');
-            let dashboardList = response.data.dashboardList;
-            let blockList = [];
-            for (let i = 0; i < dashboardList.length; i++) {
-                blockList = await loadDashboard(dashboardList[i]);
-            }
-            let div = document.getElementById('dashboard');
-            for (let i = 0; i < blockList.length; i++) {
-                let block = blockList[i];
-                block.build(div, "edit");
-            }
-            dragAndDrop();
-        }
-        loadAllDashboards();
+    const params = new URLSearchParams(window.location.search);
+        window.id = params.get('id');
+        loadDashboard(id, "edit");
 </script>
 
 </head>
@@ -44,9 +31,11 @@
 <body>
     <div class="second-header">
         <h2>Edit Block List</h2>
-        <button onclick="window.location.href='/editBlock'">Add/Edit Block</button>
+        <button onclick="window.location.href=`/editBlock?id=${window.id}`">Add/Edit Block</button>
     </div>
     <div class="drag-instructions">Drag and drop to reorder the blocks</div>
-    <div id="dashboard"></div>
+    <div id = "dashboard-container">
+        <div id="dashboard" class="dashboard"></div>
+    </div>
 </body>
 </html>

@@ -15,6 +15,8 @@ app.use(
 );
 const pool = require("./db_connection");
 const path = require("path");
+const { Block, Variable } = require('../frontend/dashboard');
+
 
 // Define middleware to check whether user is authenticated
 const requireAuth = (req, res, next) => {
@@ -43,9 +45,19 @@ app.get("/signup", (request, response) => {
 });
 
 // Restricted pages that require authentication
+// Dashboard list page
+app.get("/dashboardList", requireAuth, (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/dashboard_list.html");
+    response.status(200).sendFile(filePath);
+});
 // View dashboard page
 app.get("/myDashboard", requireAuth, (request, response) => {
+    const id = request.query.id;
     const filePath = path.join(__dirname, "../frontend/afficher_dashboard.html");
+    response.status(200).sendFile(filePath);
+});
+app.get("/createDashboard", requireAuth, (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_dashboard.html");
     response.status(200).sendFile(filePath);
 });
 // Edit block page
@@ -55,6 +67,7 @@ app.get("/editBlock", requireAuth, (request, response) => {
 });
 // Edit dashboard page
 app.get("/editDashboard", requireAuth, (request, response) => {
+    const id = request.query.id;
     const filePath = path.join(__dirname, "../frontend/modifier_dashboard.html");
     response.status(200).sendFile(filePath);
 });
@@ -71,6 +84,10 @@ app.get("/header", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/header.css");
     response.status(200).sendFile(filePath);
 });
+app.get("/create", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_dashboard.css");
+    response.status(200).sendFile(filePath);
+});
 // JS
 app.get("/functions.js", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/functions.js");
@@ -85,6 +102,10 @@ app.get("/editage.js", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/editage.js");
     response.status(200).sendFile(filePath);
 });
+app.get("/create_dashboard.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_dashboard.js");
+    response.status(200).sendFile(filePath);
+});
 
 // Endpoints
 app.get('/user/logout', (req, res) => {
@@ -92,6 +113,15 @@ app.get('/user/logout', (req, res) => {
 		req.session.loggedin = false;
 		req.session.username = "";
 		res.redirect("/");
+	} else {
+		res.status(401).send("Not logged in");
+		return;
+	}
+});
+
+app.get('/user', (req, res) => {
+    if (req.session.loggedin) {
+		return req.session.username;
 	} else {
 		res.status(401).send("Not logged in");
 		return;
@@ -108,7 +138,7 @@ app.post('/user/signup', (req, res) => {
         } else {
             req.session.loggedin = true;
             req.session.username = email;
-            res.redirect("/myDashboard");
+            res.redirect("/dashboardList");
         }
     });
 });
@@ -128,7 +158,7 @@ app.post('/user/login', (req, res) => {
             if (password === results[0].password) {
                 req.session.loggedin = true;
 		        req.session.username = email;
-                res.redirect("/myDashboard");
+                res.redirect("/dashboardList");
             } else {
                 res.status(401).send("Unauthorized, invalid password");
             }
@@ -145,7 +175,6 @@ app.put('/user/:id', (req, res) => {
             console.log(error);
             res.send({success : false});
         } else {
-            console.log(results);
             res.send({ success: true, account: results[0] });
         }
     });
@@ -169,32 +198,97 @@ app.get('/user/dashboardList', (req, res) => {
     }
 });
 
+app.get('/user/id', (req, res) => {
+    if (req.session.loggedin) {
+        const username = req.session.username;
+        const getUserIdSql = 'SELECT id FROM account WHERE username = ?';
+        pool.query(getUserIdSql, username, (error, results) => {
+            if (error) {
+                console.log(error);
+                res.send({ success: false });
+            } else {
+                const id = JSON.parse(results[0].id);
+                res.send({ success: true, id });
+            }
+        });
+    } else {
+        res.status(401).send("Not logged in");
+    }
+});
+
 app.get('/dashboard/:id', (req, res) => {
     const dashboardId = req.params.id;
     const getDashboardSql = 'SELECT * FROM dashboard WHERE id = ?';
-    pool.query(getDashboardSql, dashboardId, (error, results) => {
+    const getBlocksSql = 'SELECT * FROM block WHERE dashboard_id = ?';
+    const getVariablesSql = 'SELECT * FROM variable WHERE block_id IN (SELECT id FROM block WHERE dashboard_id = ?)';
+  
+    pool.query(getDashboardSql, dashboardId, (error, dashboardResults) => {
         if (error) {
             console.log(error);
-            res.send({success : false});
+            res.send({ success: false });
         } else {
-            const blockList = JSON.parse(results[0].block_list);
-            results[0].block_list = blockList;
-            res.send({ success: true, dashboard: results[0] });
+            const dashboard = dashboardResults[0];
+            dashboard.block_list = JSON.parse(dashboard.block_list);
+            pool.query(getBlocksSql, dashboardId, (error, blocksResults) => {
+                if (error) {
+                    console.log(error);
+                    res.send({ success: false });
+                } else {
+                    pool.query(getVariablesSql, [dashboardId, dashboardId], (error, variablesResults) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ success: false });
+                        } else {
+                            const variableList = variablesResults.map(result => new Variable(result.id, result.name, result.type, result.value, result.block_id));
+                            const blockList = [];
+                            if (dashboard.block_list) {
+                                for (let i = 0; i < dashboard.block_list.length; i++) {
+                                    const blockId = dashboard.block_list[i];
+                                    const blockResult = blocksResults.find(result => result.id === blockId);
+                                    
+    
+                                    const newBlock = new Block(blockResult.id, blockResult.title, variableList.filter(variable => variable.blockId === blockId), blockResult.dashboard_id);
+                                    blockList.push(newBlock);
+                                }
+                                dashboard.block_list = blockList.map(newBlock => newBlock.id);
+                                res.send({ success: true, dashboard, blockList });
+                            } else {
+                                res.send({ success: true, dashboard });
+                            }
+                            
+                        }
+                    });
+                }
+            });
         }
     });
 });
 
-app.post("/dashboard/add", (req, res) => {
-    const { name, description, blockList, accountId } = req.body;
-    const addDashboardSql = 'INSERT INTO dashboard (name, description, block_list, account_id) VALUES (?, ?, ?, ?)';
-    pool.query(addDashboardSql, [name, description, blockList, accountId], (error, results) => {
-        if (error) {
-            console.log(error);
-            res.send({success : false});
-        } else {
-            res.send({ success: true, dashboard: results[0] });
-        }
-    });
+app.post("/dashboard/add", (req, res) => { 
+    if (req.session.loggedin) {
+        const username = req.session.username;
+        const getUserIdSql = 'SELECT id FROM account WHERE username = ?';
+        pool.query(getUserIdSql, username, (error, results) => {
+            if (error) {
+                console.log(error);
+                res.send({ success: false });
+            } else {
+                const accountId = parseInt(results[0].id);
+                const { name, description } = req.body;
+                const addDashboardSql = 'INSERT INTO dashboard (name, description, account_id) VALUES (?, ?, ?)';
+                pool.query(addDashboardSql, [name, description, accountId], (error, results) => {
+                    if (error) {
+                        console.log(error);
+                        res.send({success : false});
+                    } else {
+                        res.send({ success: true, dashboardId: results.insertId });
+                    }
+                });
+            }
+        });
+    } else {
+        res.status(401).send("Not logged in");
+    }
 });
 
 app.put('/dashboard/edit/:id', (req, res) => {
@@ -208,22 +302,6 @@ app.put('/dashboard/edit/:id', (req, res) => {
             console.log(error);
             res.send({success : false});
         } else {
-            console.log(results);
-            res.send({ success: true, dashboard: results[0] });
-        }
-    });
-});
-
-app.put('/dashboard/addBlock/:id', (req, res) => {
-    const dashboardId = req.params.id;
-    const block = req.body.block;
-    const addBlockSql = 'UPDATE dashboard SET block_list = JSON_ARRAY_APPEND(block_list, "$", ?) WHERE id = ?';
-    pool.query(addBlockSql, [JSON.stringify(block), dashboardId], (error, results) => {
-        if (error) {
-            console.log(error);
-            res.send({success : false});
-        } else {
-            console.log(results);
             res.send({ success: true, dashboard: results[0] });
         }
     });
@@ -231,14 +309,14 @@ app.put('/dashboard/addBlock/:id', (req, res) => {
 
 app.put('/dashboard/updateBlockOrder/:id', (req, res) => {
     const dashboardId = req.params.id;
-    const newBlockOrder = req.body.blockList;
+    const blockOrder = req.body.blockList;
+    const newBlockOrder = blockOrder.map(Number);
     const updateBlockOrderSql = 'UPDATE dashboard SET block_list = ? WHERE id = ?';
     pool.query(updateBlockOrderSql, [JSON.stringify(newBlockOrder), dashboardId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
         } else {
-            console.log(results);
             res.send({ success: true });
         }
     });
@@ -246,20 +324,33 @@ app.put('/dashboard/updateBlockOrder/:id', (req, res) => {
 
 app.put('/dashboard/addBlock/:id', (req, res) => {
     const dashboardId = req.params.id;
-	const name = req.body.name;
-	const description = req.body.description;
-	const blockList = req.body.blockList;
-    const editDashboardSql = 'UPDATE dashboard SET name = ?, description = ?, block_list = ? WHERE id = ?';
-    pool.query(editDashboardSql, [name, description, JSON.stringify(blockList), dashboardId], (error, results) => {
+    const blockId = parseInt(req.body.blockId);
+    // Get the existing block list from the database
+    const dashboardQuery = 'SELECT block_list FROM dashboard WHERE id = ?';
+    pool.query(dashboardQuery, [dashboardId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
         } else {
-            console.log(results);
-            res.send({ success: true, dashboard: results[0] });
+            const blockList = JSON.parse(results[0].block_list) || [];
+            // Add the new block ID to the block list
+            if (!blockList.includes(blockId)) {
+                blockList.push(blockId);
+            }
+            // Update the block list in the database
+            const updateQuery = 'UPDATE dashboard SET block_list = ? WHERE id = ?';
+            pool.query(updateQuery, [JSON.stringify(blockList), dashboardId], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.send({success : false});
+                } else {
+                    res.send({ success: true, dashboard: results[0] });
+                }
+            });
         }
     });
 });
+  
 
 app.get('/block/:id', (req, res) => {
 	const blockId = req.params.id;
@@ -281,10 +372,10 @@ app.post('/block/add', (req, res) => {
 	const addBlockSql = 'INSERT INTO block (title, dashboard_id, variable_list) VALUES (?, ?, ?)';
 	pool.query(addBlockSql, [title, dashboardId, JSON.stringify(variableList)], (error, results) => {
 		if (error) {
-		console.log(error);
-		res.send({success : false});
+            console.log(error);
+            res.send({success : false});
 		} else {
-		res.send({ success: true, block: results[0] });
+		    res.send({ success: true, blockId: results.insertId });
 		}
 	});
 });
@@ -298,10 +389,39 @@ app.put('/block/edit/:id', (req, res) => {
 		console.log(error);
 		res.send({success : false});
 	  } else {
-		console.log(results);
 		res.send({ success: true, block: results[0] });
 	  }
 	});
+});
+
+app.put('/block/addVariable/:id', (req, res) => {
+    const blockId = req.params.id;
+    const variableId = parseInt(req.body.variableId);
+    console.log(req.body);
+    // Get the existing block list from the database
+    const blockQuery = 'SELECT variable_list FROM block WHERE id = ?';
+    pool.query(blockQuery, [blockId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({success : false});
+        } else {
+            const variableList = JSON.parse(results[0].variable_list) || [];
+            // Add the new block ID to the block list
+            if (!variableList.includes(variableId)) {
+                variableList.push(variableId);
+            }
+            // Update the block list in the database
+            const updateQuery = 'UPDATE block SET variable_list = ? WHERE id = ?';
+            pool.query(updateQuery, [JSON.stringify(variableList), blockId], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.send({success : false});
+                } else {
+                    res.send({ success: true, block: results[0] });
+                }
+            });
+        }
+    });
 });
 
 app.get('/variable/:id', (req, res) => {
@@ -319,13 +439,13 @@ app.get('/variable/:id', (req, res) => {
 
 app.post('/variable/add', (req, res) => {
     const { name, type, value, blockId} = req.body;
-    const addVariableSql = 'INSERT INTO variable (name, type, value, block_id) VALUES (?, ?, ?, ?, ?)';
+    const addVariableSql = 'INSERT INTO variable (name, type, value, block_id) VALUES (?, ?, ?, ?)';
     pool.query(addVariableSql, [name, type, value, blockId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
         } else {
-            res.send({ success: true, variable: results[0] });
+            res.send({ success: true, variableId: results.insertId });
         }
     });
 });
@@ -339,7 +459,6 @@ app.put('/variable/edit/:id', (req, res) => {
             console.log(error);
             res.send({success : false});
         } else {
-            console.log(results);
             res.send({ success: true, variable: results[0] });
         }
     });
