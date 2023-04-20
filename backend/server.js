@@ -52,7 +52,7 @@ app.get("/dashboardList", requireAuth, (request, response) => {
 });
 // View dashboard page
 app.get("/myDashboard", requireAuth, (request, response) => {
-    const id = request.query.id;
+    const id = request.query.dashboardId;
     const filePath = path.join(__dirname, "../frontend/afficher_dashboard.html");
     response.status(200).sendFile(filePath);
 });
@@ -394,18 +394,68 @@ app.post('/block/add', (req, res) => {
 	});
 });
 
-app.put('/block/edit/:id', (req, res) => {
+app.put('/block/:id', (req, res) => {
 	const blockId = req.params.id;
-	const { title, dashboardId, variableList } = req.body;
-	const editBlockSql = 'UPDATE block SET title = ?, dashboard_id = ?, variable_list = ? WHERE id = ?';
-	pool.query(editBlockSql, [title, dashboardId, JSON.stringify(variableList), blockId], (error, results) => {
-	  if (error) {
-		console.log(error);
-		res.send({success : false});
-	  } else {
-		res.send({ success: true, block: results[0] });
-	  }
+	const { title, variableList } = req.body;
+    console.log("blockId", blockId);
+    console.log("variableList", variableList);
+    console.log("JSON.stringify(variableList)", JSON.stringify(variableList));
+    console.log("title", title);
+	const editBlockSql = 'UPDATE block SET title = ?, variable_list = ? WHERE id = ?';
+	pool.query(editBlockSql, [title, JSON.stringify(variableList), blockId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({success : false});
+        } else {
+            console.log("results", results)
+            res.send({ success: true, block: results[0] });
+        }
 	});
+});
+
+app.delete('/block/:id', (req, res) => {
+    const blockId = req.params.id;
+    const deleteVariablesSql = 'DELETE FROM variable WHERE block_id = ?';
+    pool.query(deleteVariablesSql, blockId, (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            const getDashboardSql = 'SELECT * FROM dashboard WHERE block_list LIKE ?';
+            const blockIdStr = `%${blockId}%`;
+            pool.query(getDashboardSql, blockIdStr, (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.send({ success: false });
+                } else {
+                    const dashboard = results[0];
+                    const blockListArr = JSON.parse(dashboard.block_list);
+                    const blockIndex = blockListArr.indexOf(parseInt(blockId));
+                    if (blockIndex > -1) {
+                        blockListArr.splice(blockIndex, 1);
+                    }
+                    const newBlockList = JSON.stringify(blockListArr);
+                    const updateDashboardSql = 'UPDATE dashboard SET block_list = ? WHERE id = ?';
+                    pool.query(updateDashboardSql, [newBlockList, dashboard.id], (error, results) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ success: false });
+                        } else {
+                            const deleteBlockSql = 'DELETE FROM block WHERE id = ?';
+                            pool.query(deleteBlockSql, blockId, (error, results) => {
+                                if (error) {
+                                    console.log(error);
+                                    res.send({ success: false });
+                                } else {
+                                    res.send({ success: true });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
 
 app.put('/block/addVariable/:id', (req, res) => {
@@ -463,11 +513,11 @@ app.post('/variable/add', (req, res) => {
     });
 });
 
-app.put('/variable/edit/:id', (req, res) => {
+app.put('/variable/:id', (req, res) => {
     const variableId = req.params.id;
-    const { name, description, type, value, blockId } = req.body;
-    const editVariableSql = 'UPDATE variable SET name = ?, description = ?, type = ?, value = ?, block_id = ? WHERE id = ?';
-    pool.query(editVariableSql, [name, description, type, value, blockId, variableId], (error, results) => {
+    const { name, type, value } = req.body;
+    const editVariableSql = 'UPDATE variable SET name = ?, type = ?, value = ? WHERE id = ?';
+    pool.query(editVariableSql, [name, type, value, variableId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
@@ -476,6 +526,44 @@ app.put('/variable/edit/:id', (req, res) => {
         }
     });
 });
+
+app.delete('/variable/:id', (req, res) => {
+    const variableId = req.params.id;
+    const getBlockSql = 'SELECT * FROM block WHERE variable_list LIKE ?';
+    const variableIdStr = `%${variableId}%`;
+    pool.query(getBlockSql, variableIdStr, (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            const block = results[0];
+            const variableListArr = JSON.parse(block.variable_list);
+            const variableIndex = variableListArr.indexOf(parseInt(variableId));
+            if (variableIndex > -1) {
+                variableListArr.splice(variableIndex, 1);
+            }
+            const newVariableList = JSON.stringify(variableListArr);
+            const updateBlockSql = 'UPDATE block SET variable_list = ? WHERE id = ?';
+            pool.query(updateBlockSql, [newVariableList, block.id], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.send({ success: false });
+                } else {
+                    const deleteVariableSql = 'DELETE FROM variable WHERE id = ?';
+                    pool.query(deleteVariableSql, variableId, (error, results) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ success: false });
+                        } else {
+                            res.send({ success: true });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+  
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });

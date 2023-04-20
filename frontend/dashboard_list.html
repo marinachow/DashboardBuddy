@@ -18,7 +18,7 @@
                 const dashboardListItem = document.createElement('li');
                 const dashboardLink = document.createElement('a');
                 dashboardLink.textContent = `Dashboard ${dashboardId}`;
-                dashboardLink.href = `/myDashboard?id=${dashboardId}`;
+                dashboardLink.href = `/myDashboard?dashboardId=${dashboardId}`;
                 dashboardListItem.appendChild(dashboardLink);
                 dashboardListElement.appendChild(dashboardListItem);
             });

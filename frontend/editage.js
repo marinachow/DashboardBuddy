@@ -59,7 +59,6 @@ numVariablesInput.addEventListener('change', () => {
     }
     const button = document.createElement("button");
     button.type = "submit";
-    button.classList.add("add-button");
     button.textContent = "Create Block";
     createButton.appendChild(button);
 });

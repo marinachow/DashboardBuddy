@@ -4,15 +4,18 @@ async function loadDashboard(id, mode) {
         const blockListData = response.data.blockList;
         let div = document.getElementById('dashboard');
         blockListData.map(blockData => {
-            const block = new Block(blockData.id, blockData.titre, blockData.listeVariables, blockData.idDashboard);
-            block.listeVariables = blockData.listeVariables.map(variable => new Variable(variable.id, variable.titre, variable.type, variable.value, variable.blockId));
-            if (mode == "edit") {
-                block.build(div, "edit");
+            const block = new Block(blockData.blockId, blockData.titre, blockData.listeVariables, blockData.idDashboard);
+            block.listeVariables = blockData.listeVariables.map(variable => new Variable(variable.variableId, variable.titre, variable.type, variable.value, variable.blockId));
+            if (mode == "dragAndDrop") {
+                block.build(div, "dragAndDrop");
+            } 
+            else if (mode == "editBlock") {
+                block.build(div, "editBlock");
             } else {
                 block.build(div);
             }
         });
-        if (mode == "edit") {
+        if (mode == "dragAndDrop") {
             dragAndDrop(id);
         }
     }

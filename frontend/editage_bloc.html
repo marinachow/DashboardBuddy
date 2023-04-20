@@ -10,8 +10,8 @@
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script>
         const params = new URLSearchParams(window.location.search);
-        window.id = params.get('id');
-        loadDashboard(id);
+        window.id = params.get('dashboardId');
+        loadDashboard(id, "editBlock");
     </script>
 </head>
 <body>
@@ -41,7 +41,7 @@
 	</form>
 	<div class="second-header">
 		<h2>Block List</h2>
-		<button onclick="window.location.href=`/editDashboard?id=${window.id}`">Edit</button>
+		<button onclick="window.location.href=`/editDashboard?dashboardId=${window.id}`">Edit Block Order</button>
 	</div>
     <div id = "dashboard-container">
         <div id="dashboard" class="dashboard"></div>
