@@ -117,6 +117,8 @@ class Variable {
 
     build(div, mode) {
 		const variableId = this.variableId;
+		const variableType = this.type;
+		const variableValue = this.value;
 		//conteneur "variable"
 		let conteneur = document.createElement('div');
 		conteneur.className = "variable";
@@ -174,8 +176,8 @@ class Variable {
 					newVariableTitle = titre.innerHTML;
 					axios.put(`http://localhost:3000/variable/${variableId}`, {
 						name: newVariableTitle,
-						type: this.type,
-						value: this.value
+						type: variableType,
+						value: variableValue
 					})
 					.then((res) => {
 						console.log("Variable editted");
