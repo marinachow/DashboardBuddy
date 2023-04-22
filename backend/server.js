@@ -136,7 +136,8 @@ app.get('/user/logout', (req, res) => {
 
 app.get('/user', (req, res) => {
     if (req.session.loggedin) {
-		return req.session.username;
+        console.log(req.session.username);
+		res.send({ success : true, username: req.session.username});
 	} else {
 		res.status(401).send("Not logged in");
 		return;
@@ -478,17 +479,16 @@ app.post('/block/add', (req, res) => {
 	});
 });
 
-app.put('/block/:id', (req, res) => {
+app.put('/blockName/:id', (req, res) => {
 	const blockId = req.params.id;
-	const { title, variableList } = req.body;
-	const editBlockSql = 'UPDATE block SET title = ?, variable_list = ? WHERE id = ?';
-	pool.query(editBlockSql, [title, JSON.stringify(variableList), blockId], (error, results) => {
+	const { title } = req.body;
+	const editBlockSql = 'UPDATE block SET title = ? WHERE id = ?';
+	pool.query(editBlockSql, [title, blockId], (error, results) => {
         if (error) {
             console.log(error);
-            res.send({success : false});
+            res.send({ success : false });
         } else {
-            console.log("results", results)
-            res.send({ success: true, block: results[0] });
+            res.send({ success: true });
         }
 	});
 });

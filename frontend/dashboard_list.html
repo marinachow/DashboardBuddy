@@ -20,7 +20,20 @@
                 dashboardLink.textContent = `Dashboard ${dashboardId}`;
                 dashboardLink.href = `/myDashboard?dashboardId=${dashboardId}`;
                 dashboardListItem.appendChild(dashboardLink);
+                let deleteDashboardBtn = document.createElement('button');
+			    deleteDashboardBtn.innerHTML = "Delete Dashboard";
+                deleteDashboardBtn.onclick = function() {
+				axios.delete(`http://localhost:3000/dashboard/${dashboardId}`)
+					.then((res) => {
+						console.log("Dashboard deleted");
+						location.reload();
+					})
+					.catch((err) => {
+						console.error(err);
+					});
+			    }
                 dashboardListElement.appendChild(dashboardListItem);
+                dashboardListElement.appendChild(deleteDashboardBtn);
             });
         })
         .catch(error => {

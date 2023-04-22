@@ -5,6 +5,10 @@ body {
 	padding: 0;
 }
 
+#dashboard-description {
+  padding: 0px 0px 0px 30px;
+}
+
 #dashboard {
   background: #F4F4F4;
   display : flex;

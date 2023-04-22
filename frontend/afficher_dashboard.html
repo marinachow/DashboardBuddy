@@ -9,25 +9,31 @@
     <script src="dashboard.js" type="text/javascript"></script>        
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
+        afficherUsername();
         const params = new URLSearchParams(window.location.search);
         window.id = params.get('dashboardId');
-        loadDashboard(id);    
+        loadDashboard(id, "afficher");
     </script>
 
 </head>
 <body>
     <header>
         <h1>Dashboard Buddy</h1>
-        <div class="user-button">
-            <form action="/user/logout" method="get">
-                <button class="user" type="submit">Log out</button>
-            </form>
+        <div id="user">
+            <div id="username"></div>
+            <div class="user-button">
+                <form action="/user/logout" method="get">
+                    <button class="user" type="submit">Log out</button>
+                </form>
+            </div>
         </div>
     </header>
-    <div class="second-header">
-        <h2>My Dashboard</h2>
+    <div id="second-header" class="second-header">
+        <h2 id="dashboard-name"></h2>
+        <button onclick="editDashboardName()">Edit Name</button>
         <button onclick="window.location.href=`/editDashboard?dashboardId=${window.id}`">Edit Block Order</button>
     </div>
+    <div id="dashboard-description"></div>
     <div id = "dashboard-container">
         <div id="dashboard" class="dashboard"></div>
     </div>

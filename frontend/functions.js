@@ -1,14 +1,26 @@
+function afficherUsername() {
+    axios.get('http://localhost:3000/user')
+    .then(response => {
+        let username = response.data.username;
+        let div = document.getElementById("username");
+        let label = document.createElement('label');
+        label.textContent = username;
+        div.appendChild(label);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}
+
 function loadDashboard(id, mode) {    
     axios.get(`http://localhost:3000/dashboard/${id}`)
     .then(response => {
+        const dashboardData = response.data.dashboard;
         const blockListData = response.data.blockList;
         if (blockListData) {
             let div = document.getElementById('dashboard');
-            blockListData.map(blockData => {
-                const block = new Block(blockData.blockId, blockData.titre, blockData.listeVariables, blockData.idDashboard);
-                block.listeVariables = blockData.listeVariables.map(variable => new Variable(variable.variableId, variable.titre, variable.type, variable.value, variable.blockId));
-                block.build(div, mode);
-            });
+            const dashboard = new Dashboard(dashboardData.id, dashboardData.name, dashboardData.description, blockListData, blockListData.account_id);
+            dashboard.build(div, mode);
             if (mode == "dragAndDrop") {
                 dragAndDrop("dashboard", id);
             }
@@ -33,6 +45,31 @@ function loadBlock(id, mode) {
     })
     .catch(error => {
         console.error(error);
+    });
+}
+
+function editDescription(event) { 
+    //lets go 
+}
+
+function editDashboardName(event) {
+    //lets go 
+}
+
+function editBlockName(event) {
+    const blockName = event.target;
+    const blockId = blockName.parentNode.parentNode.dataset.id;
+    newBlockTitle = blockName.innerHTML;
+    axios.put(`http://localhost:3000/blockName/${blockId}`, {
+        title: newBlockTitle,
+    })
+    .then((res) => {
+        console.log("Block editted");
+        blockName.removeAttribute("contenteditable");
+        blockName.style.border = "none";
+    })
+    .catch((err) => {
+        console.error(err);
     });
 }
 

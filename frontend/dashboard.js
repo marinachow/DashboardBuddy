@@ -1,11 +1,36 @@
 class Dashboard {
-  constructor(name, description, listeBlocks, idAccount) {
-    this.name = name;
-    this.description = description;
-    this.listeBlocks = listeBlocks;
-    this.idAccount = idAccount;
-  }
+	constructor(dashboardId, name, description, listeBlocks, idAccount) {
+		this.dashboardId = dashboardId;
+		this.name = name;
+		this.description = description;
+		this.listeBlocks = listeBlocks;
+		this.idAccount = idAccount;
+	}
 
+	build(div, mode) {
+		if (mode == "afficher") {
+			let headerDiv = document.getElementById("dashboard-name");
+			headerDiv.textContent = this.name;
+			const descriptionDiv = document.getElementById("dashboard-description");
+			const descriptionP = document.createElement("p");
+			descriptionP.textContent = this.description;
+			let editDescriptionBtn = document.createElement('button');
+			editDescriptionBtn.innerHTML = "Edit Description";
+			editDescriptionBtn.onclick = function() {
+				descriptionP.setAttribute("contenteditable", "true");
+				descriptionP.style.border = "2px solid black";
+				descriptionP.style.borderRadius = "5px";
+				descriptionP.addEventListener('blur', editDescription);
+			}
+			descriptionDiv.appendChild(descriptionP);
+			descriptionDiv.appendChild(editDescriptionBtn);
+		}
+		this.listeBlocks.map(blockData => {
+			const block = new Block(blockData.blockId, blockData.titre, blockData.listeVariables, blockData.idDashboard);
+			block.listeVariables = blockData.listeVariables.map(variable => new Variable(variable.variableId, variable.titre, variable.type, variable.value, variable.blockId));
+			block.build(div, mode);
+		});
+	}
 }
 
 class Block {
@@ -21,15 +46,14 @@ class Block {
 
     build(div, mode) {
 		const blockId = this.blockId;
-		const variableList = this.listeVariables.map(variable => variable.variableId);
 		//blockground (div qui contient le block et son entête)
 		let blockGround = document.createElement('div');
 		if (mode == "dragAndDrop"){
 			blockGround.className = "edit-blockGround";
-			blockGround.dataset.id = blockId;
 		} else {
 			blockGround.className = "blockGround";
 		}
+		blockGround.dataset.id = blockId;
 		div.appendChild(blockGround);
 
 		//entête (qui contient le titre et éventuellement les boutons d'édition ou d'affichage du block)
@@ -58,22 +82,7 @@ class Block {
 				titreblock.setAttribute("contenteditable", "true");
 				titreblock.style.border = "2px solid black";
 				titreblock.style.borderRadius = "5px";
-				let newBlockTitle;
-				titreblock.addEventListener('blur', function() {
-					newBlockTitle = titreblock.innerHTML;
-					axios.put(`http://localhost:3000/block/${blockId}`, {
-						title: newBlockTitle,
-						variableList: variableList
-					})
-					.then((res) => {
-						console.log("Block editted");
-						titreblock.removeAttribute("contenteditable");
-  						titreblock.style.border = "none";
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-				});
+				titreblock.addEventListener('blur', editBlockName);
 			}
 			//Delete Block button
 			let deleteBlockBtn = document.createElement('button');
@@ -213,5 +222,5 @@ class Variable {
 
     }
 }
-module.exports = { Block, Variable };
+module.exports = { Dashboard, Block, Variable };
  
