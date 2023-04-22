@@ -60,9 +60,14 @@ app.get("/createDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/create_dashboard.html");
     response.status(200).sendFile(filePath);
 });
-// Edit block page
+// Create block page
 app.get("/createBlock", requireAuth, (request, response) => {
-    const filePath = path.join(__dirname, "../frontend/editage_bloc.html");
+    const filePath = path.join(__dirname, "../frontend/create_block.html");
+    response.status(200).sendFile(filePath);
+});
+// Edit block page
+app.get("/editBlock", requireAuth, (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/edit_block.html");
     response.status(200).sendFile(filePath);
 });
 // Edit dashboard page
@@ -245,8 +250,6 @@ app.get('/dashboard/:id', (req, res) => {
                                 for (let i = 0; i < dashboard.block_list.length; i++) {
                                     const blockId = dashboard.block_list[i];
                                     const blockResult = blocksResults.find(result => result.id === blockId);
-                                    
-    
                                     const newBlock = new Block(blockResult.id, blockResult.title, variableList.filter(variable => variable.blockId === blockId), blockResult.dashboard_id);
                                     blockList.push(newBlock);
                                 }
@@ -364,21 +367,93 @@ app.put('/dashboard/addBlock/:id', (req, res) => {
         }
     });
 });
-  
 
+app.delete('/dashboard/:id', (req, res) => {
+    const dashboardId = req.params.id;
+    const getBlocksSql = 'SELECT * FROM block WHERE dashboard_id = ?';
+    pool.query(getBlocksSql, dashboardId, (error, blockResults) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            const blockIds = blockResults.map((block) => block.id);
+
+            const deleteVariablesSql = 'DELETE FROM variable WHERE block_id IN (?)';
+            pool.query(deleteVariablesSql, [blockIds], (error, variableResults) => {
+                if (error) {
+                    console.log(error);
+                    res.send({ success: false });
+                } else {
+                    const deleteBlocksSql = 'DELETE FROM block WHERE dashboard_id = ?';
+                    pool.query(deleteBlocksSql, dashboardId, (error, blockResults) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ success: false });
+                        } else {
+                            const deleteDashboardSql = 'DELETE FROM dashboard WHERE id = ?';
+                            pool.query(deleteDashboardSql, dashboardId, (error, dashboardResults) => {
+                                if (error) {
+                                    console.log(error);
+                                    res.send({ success: false });
+                                } else {
+                                    const getAccountSql = 'SELECT * FROM account WHERE dashboard_list LIKE ?';
+                                    const dashboardIdStr = `%${dashboardId}%`;
+                                    pool.query(getAccountSql, dashboardIdStr, (error, accountResults) => {
+                                        if (error) {
+                                            console.log(error);
+                                            res.send({ success: false });
+                                        } else {
+                                            const account = accountResults[0];
+                                            const dashboardListArr = JSON.parse(account.dashboard_list);
+                                            const dashboardIndex = dashboardListArr.indexOf(parseInt(dashboardId));
+                                            if (dashboardIndex > -1) {
+                                                dashboardListArr.splice(dashboardIndex, 1);
+                                            }
+                                            const newDashboardList = JSON.stringify(dashboardListArr);
+                                            const updateAccountSql = 'UPDATE account SET dashboard_list = ? WHERE id = ?';
+                                            pool.query(updateAccountSql, [newDashboardList, account.id], (error, results) => {
+                                                if (error) {
+                                                    console.log(error);
+                                                    res.send({ success: false });
+                                                } else {
+                                                    res.send({ success: true });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+  
 app.get('/block/:id', (req, res) => {
-	const blockId = req.params.id;
-	const getBlockSql = 'SELECT * FROM block WHERE id = ?';
-	pool.query(getBlockSql, blockId, (error, results) => {
-	  if (error) {
-		console.log(error);
-		res.send({success : false});
-	  } else {
-        const variableList = JSON.parse(results[0].variable_list);
-        results[0].variable_list = variableList;
-		res.send({ success: true, block: results[0] });
-	  }
-	});
+    const blockId = req.params.id;
+    const getBlockSql = 'SELECT * FROM block WHERE id = ?';
+    const getVariablesSql = 'SELECT * FROM variable WHERE block_id = ?';
+  
+    pool.query(getBlockSql, blockId, (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            const block = results[0];
+            pool.query(getVariablesSql, blockId, (error, variablesResults) => {
+                if (error) {
+                    console.log(error);
+                    res.send({ success: false });
+                } else {
+                    const variableList = variablesResults.map(result => new Variable(result.id, result.name, result.type, result.value, blockId));
+                    block.variable_list = variableList;
+                    res.send({ success: true, block });
+                }
+            });
+        }
+    });
 });
   
 app.post('/block/add', (req, res) => {
@@ -397,10 +472,6 @@ app.post('/block/add', (req, res) => {
 app.put('/block/:id', (req, res) => {
 	const blockId = req.params.id;
 	const { title, variableList } = req.body;
-    console.log("blockId", blockId);
-    console.log("variableList", variableList);
-    console.log("JSON.stringify(variableList)", JSON.stringify(variableList));
-    console.log("title", title);
 	const editBlockSql = 'UPDATE block SET title = ?, variable_list = ? WHERE id = ?';
 	pool.query(editBlockSql, [title, JSON.stringify(variableList), blockId], (error, results) => {
         if (error) {
@@ -483,6 +554,21 @@ app.put('/block/addVariable/:id', (req, res) => {
                     res.send({ success: true, block: results[0] });
                 }
             });
+        }
+    });
+});
+
+app.put('/block/updateVariableOrder/:id', (req, res) => {
+    const blockId = req.params.id;
+    const variableOrder = req.body.variableList;
+    const newVariableOrder = variableOrder.map(Number);
+    const updateVariableOrderSql = 'UPDATE block SET variable_list = ? WHERE id = ?';
+    pool.query(updateVariableOrderSql, [JSON.stringify(newVariableOrder), blockId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({success : false});
+        } else {
+            res.send({ success: true });
         }
     });
 });

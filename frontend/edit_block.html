@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Dashboard</title>
+    <title>Edit Block</title>
 
     <link rel="stylesheet" href="/style">
     <link rel="stylesheet" href="/header">
@@ -15,8 +15,8 @@
 
 <script>
     const params = new URLSearchParams(window.location.search);
-    window.id = params.get('dashboardId');
-    loadDashboard(id, "dragAndDrop");
+    window.id = params.get('blockId');
+    loadBlock(window.id, "dragAndDrop");
 </script>
 
 </head>
@@ -30,15 +30,15 @@
 </header>
 <body>
     <div class="second-header">
-        <h2>Edit Block List</h2>
-        <button onclick="window.location.href=`/createBlock?dashboardId=${window.id}`">Add/Edit Block</button>
+        <h2>Edit Variable List</h2>
+        <button onclick="window.location.href=`/createVariable?blockId=${window.id}`">Add/Edit Variable</button>
     </div>
     <div class="drag-instructions">
-        Drag and drop to reorder the blocks
-        <button onclick="saveOrder('dashboard',window.id)">Save Order</button>
+        Drag and drop to reorder the variables
+        <button onclick="saveOrder('block', window.id)">Save Order</button>
     </div>
-    <div id = "dashboard-container">
-        <div id="dashboard" class="dashboard"></div>
+    <div id = "block-container">
+        <div id="block" class="block"></div>
     </div>
 </body>
 </html>

@@ -26,7 +26,7 @@ class Block {
 		let blockGround = document.createElement('div');
 		if (mode == "dragAndDrop"){
 			blockGround.className = "edit-blockGround";
-			blockGround.dataset.id = this.id;
+			blockGround.dataset.id = blockId;
 		} else {
 			blockGround.className = "blockGround";
 		}
@@ -59,7 +59,7 @@ class Block {
 				titreblock.style.border = "2px solid black";
 				titreblock.style.borderRadius = "5px";
 				let newBlockTitle;
-				titreblock.addEventListener('input', function() {
+				titreblock.addEventListener('blur', function() {
 					newBlockTitle = titreblock.innerHTML;
 					axios.put(`http://localhost:3000/block/${blockId}`, {
 						title: newBlockTitle,
@@ -88,6 +88,13 @@ class Block {
 					.catch((err) => {
 						console.error(err);
 					});
+			}
+			//Edit block's variable order button
+			let editVariableOrderBtn = document.createElement('button');
+			editVariableOrderBtn.innerHTML = "Edit Variable Order";
+			entete.appendChild(editVariableOrderBtn);
+			editVariableOrderBtn.onclick = function() {
+				window.location.href=`editBlock?blockId=${blockId}`;
 			}
 			for (let i = 0 ; i < this.listeVariables.length ; i++) {
 				let variable = this.listeVariables[i];
@@ -121,8 +128,13 @@ class Variable {
 		const variableValue = this.value;
 		//conteneur "variable"
 		let conteneur = document.createElement('div');
-		conteneur.className = "variable";
-		conteneur.id = `var1`;
+		conteneur.id = "var";
+		if (mode == "dragAndDrop") {
+			conteneur.className = "edit-variable";
+			conteneur.dataset.id = variableId;
+		} else {
+			conteneur.className = "variable";
+		}
 		div.appendChild(conteneur);
 
 		//titre de la variable
@@ -172,20 +184,22 @@ class Variable {
 				titre.style.border = "2px solid black";
 				titre.style.borderRadius = "5px";
 				let newVariableTitle;
-				titre.addEventListener('input', function() {
-					newVariableTitle = titre.innerHTML;
-					axios.put(`http://localhost:3000/variable/${variableId}`, {
-						name: newVariableTitle,
-						type: variableType,
-						value: variableValue
-					})
-					.then((res) => {
-						console.log("Variable editted");
-						titre.removeAttribute("contenteditable");
-						titre.style.border = "none";
-					})
-					.catch((err) => {
-						console.error(err);
+				titre.addEventListener('blur', function() {
+					timeoutId = setTimeout(() => {
+						newVariableTitle = titre.innerHTML;
+						axios.put(`http://localhost:3000/variable/${variableId}`, {
+							name: newVariableTitle,
+							type: variableType,
+							value: variableValue
+						})
+						.then((res) => {
+							console.log("Variable edited");
+							titre.removeAttribute("contenteditable");
+							titre.style.border = "none";
+						})
+						.catch((err) => {
+							console.error(err);
+						});
 					});
 				});
 			}
