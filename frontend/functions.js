@@ -7,14 +7,7 @@ function loadDashboard(id, mode) {
             blockListData.map(blockData => {
                 const block = new Block(blockData.blockId, blockData.titre, blockData.listeVariables, blockData.idDashboard);
                 block.listeVariables = blockData.listeVariables.map(variable => new Variable(variable.variableId, variable.titre, variable.type, variable.value, variable.blockId));
-                if (mode == "dragAndDrop") {
-                    block.build(div, "dragAndDrop");
-                } 
-                else if (mode == "editBlock") {
-                    block.build(div, "editBlock");
-                } else {
-                    block.build(div);
-                }
+                block.build(div, mode);
             });
             if (mode == "dragAndDrop") {
                 dragAndDrop("dashboard", id);
@@ -29,23 +22,13 @@ function loadDashboard(id, mode) {
 function loadBlock(id, mode) {    
     axios.get(`http://localhost:3000/block/${id}`)
     .then(response => {
-        const variableListData = response.data.block.variable_list;
-        if (variableListData) {
-            let div = document.getElementById('block');
-            variableListData.map(variableData => {
-                const variable = new Variable(variableData.variableId, variableData.titre, variableData.type, variableData.value, variableData.blockId);
-                if (mode == "dragAndDrop") {
-                    variable.build(div, "dragAndDrop");
-                } 
-                else if (mode == "editBlock") {
-                    variable.build(div, "editBlock");
-                } else {
-                    variable.build(div);
-                }
-            });
-            if (mode == "dragAndDrop") {
-                dragAndDrop("block", id);
-            }
+        let div = document.getElementById('blockGround');
+        const blockData = response.data.block;
+        const block = new Block(blockData.id, blockData.title, blockData.variable_list, blockData.dashboard_id);
+        block.listeVariables = blockData.variable_list.map(variable => new Variable(variable.variableId, variable.titre, variable.type, variable.value, variable.blockId));
+        block.build(div, mode);
+        if (mode == "dragAndDrop") {
+            dragAndDrop("block", id);
         }
     })
     .catch(error => {
@@ -53,10 +36,58 @@ function loadBlock(id, mode) {
     });
 }
 
+function editVariableName(event) {
+    const variableName = event.target;
+    const variableId = variableName.parentNode.dataset.id;
+    timeoutId = setTimeout(() => {
+        let newVariableTitle = variableName.innerHTML;
+        axios.put(`http://localhost:3000/variableName/${variableId}`, {
+            name: newVariableTitle
+        })
+        .then((res) => {
+            console.log("Variable edited");
+            variableName.removeAttribute("contenteditable");
+            variableName.style.border = "none";
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+    });
+}
 
-const buttonClicked = function (titre) {
-    //TODO action quand le bouton booléen (toggle button bleu) est cliqué : dans la BDD, changer 0/1
-  };
+function sliderClicked(event) {
+    const variableId = event.target.parentNode.parentNode.dataset.id;
+    console.log(variableId);
+    let variableValue;
+    if (event.target.checked) {
+        variableValue = 1;
+    } else {
+        variableValue = 0;
+    }
+    axios.put(`http://localhost:3000/variableValue/${variableId}`, {
+            value: variableValue
+        })
+        .then((res) => {
+            console.log("Variable edited");
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+}
+
+function editVariableValue(event) {
+    const variableValue = event.target.value;
+    const variableId = event.target.parentNode.dataset.id;
+    axios.put(`http://localhost:3000/variableValue/${variableId}`, {
+            value: variableValue
+        })
+        .then((res) => {
+            console.log("Variable edited");
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+}
 
 let itemIds;
 function dragAndDrop(mode) {

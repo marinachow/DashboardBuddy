@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Create Variable</title>
+    <link rel="stylesheet" href="/style">
+	<link rel="stylesheet" href="/header">
+	<script src="functions.js" type="text/javascript"></script>
+	<script src="dashboard.js" type="text/javascript"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+        const params = new URLSearchParams(window.location.search);
+        window.id = params.get('blockId');
+        loadBlock(id, "editVariable");
+    </script>
+</head>
+<body>
+	<header>
+		<h1>Dashboard Buddy</h1>
+		<div class="user-button">
+			<form action="/user/logout" method="get">
+				<button class="user" type="submit">Log out</button>
+			</form>
+		</div>
+	</header>
+    <h2>Create Variable</h2>
+	<form id="variable-form" class="variable-form">
+		<div>
+			<label for="variable-name">Name:</label>
+			<input type="text" id="variable-name" name="variable-name" required>
+		</div>
+		<br>
+		<div>
+			<label for="variable-type">Type:</label>
+			<select id="variable-type" name="variable-type" required>
+				<option value="">Select a type</option>
+				<option value="button">Button</option>
+				<option value="text">Text</option>
+			</select>
+		</div>
+		<br>
+		<div>
+			<label for="variable-value">Value:</label>
+			<input type="text" id="variable-value" name="variable-value" required>
+		</div>
+		<br>
+		<button type="submit">Create Variable</button>
+	</form>
+	<div id = "block-container">
+        <div id="blockGround" class="blockGround"></div>
+    </div>
+	<script src="createVariable.js" type="text/javascript" ></script>
+</body>
+</html>

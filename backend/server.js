@@ -56,6 +56,7 @@ app.get("/myDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/afficher_dashboard.html");
     response.status(200).sendFile(filePath);
 });
+// Create dashboard page
 app.get("/createDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/create_dashboard.html");
     response.status(200).sendFile(filePath);
@@ -63,6 +64,11 @@ app.get("/createDashboard", requireAuth, (request, response) => {
 // Create block page
 app.get("/createBlock", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/create_block.html");
+    response.status(200).sendFile(filePath);
+});
+// Create variable page
+app.get("/createVariable", requireAuth, (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_variable.html");
     response.status(200).sendFile(filePath);
 });
 // Edit block page
@@ -73,7 +79,7 @@ app.get("/editBlock", requireAuth, (request, response) => {
 // Edit dashboard page
 app.get("/editDashboard", requireAuth, (request, response) => {
     const id = request.query.id;
-    const filePath = path.join(__dirname, "../frontend/modifier_dashboard.html");
+    const filePath = path.join(__dirname, "../frontend/edit_dashboard.html");
     response.status(200).sendFile(filePath);
 });
 // CSS
@@ -81,8 +87,8 @@ app.get("/style", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/style.css");
     response.status(200).sendFile(filePath);
 });
-app.get("/editage", (request, response) => {
-    const filePath = path.join(__dirname, "../frontend/editage.css");
+app.get("/createBlock", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_block.css");
     response.status(200).sendFile(filePath);
 });
 app.get("/header", (request, response) => {
@@ -103,8 +109,12 @@ app.get("/dashboard.js", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/dashboard.js");
     response.status(200).sendFile(filePath);
 });
-app.get("/editage.js", (request, response) => {
-    const filePath = path.join(__dirname, "../frontend/editage.js");
+app.get("/createVariable.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_variable.js");
+    response.status(200).sendFile(filePath);
+});
+app.get("/createBlock.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/create_block.js");
     response.status(200).sendFile(filePath);
 });
 app.get("/create_dashboard.js", (request, response) => {
@@ -435,7 +445,6 @@ app.get('/block/:id', (req, res) => {
     const blockId = req.params.id;
     const getBlockSql = 'SELECT * FROM block WHERE id = ?';
     const getVariablesSql = 'SELECT * FROM variable WHERE block_id = ?';
-  
     pool.query(getBlockSql, blockId, (error, results) => {
         if (error) {
             console.log(error);
@@ -482,6 +491,35 @@ app.put('/block/:id', (req, res) => {
             res.send({ success: true, block: results[0] });
         }
 	});
+});
+
+app.put('/block/addVariable/:id', (req, res) => {
+    const blockId = req.params.id;
+    const variableId = parseInt(req.body.variableId);
+    // Get the existing variable list from the database
+    const blockQuery = 'SELECT variable_list FROM block WHERE id = ?';
+    pool.query(blockQuery, [blockId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({success : false});
+        } else {
+            const variableList = JSON.parse(results[0].variable_list) || [];
+            // Add the new variable ID to the variable list
+            if (!variableList.includes(variableId)) {
+                variableList.push(variableId);
+            }
+            // Update the block list in the database
+            const updateQuery = 'UPDATE block SET variable_list = ? WHERE id = ?';
+            pool.query(updateQuery, [JSON.stringify(variableList), blockId], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    res.send({success : false});
+                } else {
+                    res.send({ success: true, block: results[0] });
+                }
+            });
+        }
+    });
 });
 
 app.delete('/block/:id', (req, res) => {
@@ -599,14 +637,28 @@ app.post('/variable/add', (req, res) => {
     });
 });
 
-app.put('/variable/:id', (req, res) => {
+app.put('/variableName/:id', (req, res) => {
     const variableId = req.params.id;
-    const { name, type, value } = req.body;
-    const editVariableSql = 'UPDATE variable SET name = ?, type = ?, value = ? WHERE id = ?';
-    pool.query(editVariableSql, [name, type, value, variableId], (error, results) => {
+    const { name } = req.body;
+    const editVariableSql = 'UPDATE variable SET name = ? WHERE id = ?';
+    pool.query(editVariableSql, [name, variableId], (error, results) => {
         if (error) {
             console.log(error);
-            res.send({success : false});
+            res.send({ success : false });
+        } else {
+            res.send({ success: true, variable: results[0] });
+        }
+    });
+});
+
+app.put('/variableValue/:id', (req, res) => {
+    const variableId = req.params.id;
+    const { value } = req.body;
+    const editVariableSql = 'UPDATE variable SET value = ? WHERE id = ?';
+    pool.query(editVariableSql, [value, variableId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({ success : false });
         } else {
             res.send({ success: true, variable: results[0] });
         }

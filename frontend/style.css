@@ -84,6 +84,11 @@ body {
   border-radius: 72px;
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+input.inputVar {
+  padding: 15px;
 }
 
 div.titreVar{
@@ -120,7 +125,7 @@ h2{
   color: #26394C;
 }
 
-.block-form {
+form {
   padding: 0px 30px 0 30px;
 }
 

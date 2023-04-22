@@ -98,6 +98,11 @@ class Block {
 			}
 			for (let i = 0 ; i < this.listeVariables.length ; i++) {
 				let variable = this.listeVariables[i];
+				variable.build(elem);
+			};
+		} else if (mode == "editVariable") {
+			for (let i = 0 ; i < this.listeVariables.length ; i++) {
+				let variable = this.listeVariables[i];
 				variable.build(elem, "editVariable");
 			};
 		} else {
@@ -131,10 +136,10 @@ class Variable {
 		conteneur.id = "var";
 		if (mode == "dragAndDrop") {
 			conteneur.className = "edit-variable";
-			conteneur.dataset.id = variableId;
 		} else {
 			conteneur.className = "variable";
 		}
+		conteneur.dataset.id = variableId;
 		div.appendChild(conteneur);
 
 		//titre de la variable
@@ -150,6 +155,11 @@ class Variable {
 			input.type = "text";
 			input.className = "inputVar";
 			input.value = this.value;
+			if (mode == "editVariable") {
+				input.addEventListener('change', editVariableValue);
+			} else {
+				input.disabled = true;
+			}
       	} 
       	if (this.type=="button") {
 			input = document.createElement('label');
@@ -158,14 +168,13 @@ class Variable {
 			input2.type = "checkbox";
 			let span = document.createElement('span');
 			span.className = "slider round";
+			input2.checked = (this.value === "1");
 			input.appendChild(input2);
 			input.appendChild(span);
-
-			//onclick action
-			input.onclick = buttonClicked(this.titre);
-			
-			if (this.value == "1"){
-				input.checked= true;
+			if (mode == "editVariable") {
+				input.addEventListener('change', sliderClicked);
+			} else {
+				input2.disabled = true;
 			}
       	} else { //TODO si la variable n'a pas de type texte ou button
 			input.innerHTML= "<input/>";
@@ -183,25 +192,7 @@ class Variable {
 				titre.setAttribute("contenteditable", "true");
 				titre.style.border = "2px solid black";
 				titre.style.borderRadius = "5px";
-				let newVariableTitle;
-				titre.addEventListener('blur', function() {
-					timeoutId = setTimeout(() => {
-						newVariableTitle = titre.innerHTML;
-						axios.put(`http://localhost:3000/variable/${variableId}`, {
-							name: newVariableTitle,
-							type: variableType,
-							value: variableValue
-						})
-						.then((res) => {
-							console.log("Variable edited");
-							titre.removeAttribute("contenteditable");
-							titre.style.border = "none";
-						})
-						.catch((err) => {
-							console.error(err);
-						});
-					});
-				});
+				titre.addEventListener('blur', editVariableName);
 			}
 			//Delete Variable button
 			let deleteVariableBtn = document.createElement('button');
