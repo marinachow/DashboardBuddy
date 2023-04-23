@@ -138,19 +138,17 @@ function editBlockName(event) {
 function editVariableName(event) {
     const variableName = event.target;
     const variableId = variableName.parentNode.dataset.id;
-    timeoutId = setTimeout(() => {
-        let newVariableTitle = variableName.innerHTML;
-        axios.put(`http://localhost:3000/variableName/${variableId}`, {
-            name: newVariableTitle
-        })
-        .then((res) => {
-            console.log("Variable edited");
-            variableName.removeAttribute("contenteditable");
-            variableName.style.border = "none";
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+    let newVariableTitle = variableName.innerHTML;
+    axios.put(`http://localhost:3000/variableName/${variableId}`, {
+        name: newVariableTitle
+    })
+    .then((res) => {
+        console.log("Variable edited");
+        variableName.removeAttribute("contenteditable");
+        variableName.style.border = "none";
+    })
+    .catch((err) => {
+        console.error(err);
     });
 }
 
@@ -229,7 +227,6 @@ function dragAndDrop(mode) {
         const targetItem = items[targetIndex];
         parent.insertBefore(movedItem, targetItem);
 
-        // Update the items array and itemIds
         items = Array.from(document.querySelectorAll(".edit-blockGround"));
         itemIds = Array.from(items, (item) => item.dataset.id);
     }
