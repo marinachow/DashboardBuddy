@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`account` (
   `username` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
+AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`dashboard` (
     FOREIGN KEY (`account_id`)
     REFERENCES `dashboard_db`.`account` (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 14
+AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
 
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`block` (
     FOREIGN KEY (`dashboard_id`)
     REFERENCES `dashboard_db`.`dashboard` (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 53
+AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `dashboard_db`.`variable` (
     FOREIGN KEY (`block_id`)
     REFERENCES `dashboard_db`.`block` (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 49
+AUTO_INCREMENT = 1
 DEFAULT CHARACTER SET = utf8mb4;
 
 
