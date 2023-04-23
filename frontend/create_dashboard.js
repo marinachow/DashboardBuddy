@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
 dashboardForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const dashboardName = document.getElementById('dashboard-name').value;
-    const dashboardDescription = document.getElementById('dashboard-description').value;
+    const dashboardDescription = document.getElementById('dashboard-description-textarea').value;
     axios.post('http://localhost:3000/dashboard/add', { 
         name: dashboardName,
         description: dashboardDescription

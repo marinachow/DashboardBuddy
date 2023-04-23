@@ -8,12 +8,17 @@ class Dashboard {
 	}
 
 	build(div, mode) {
-		if (mode == "afficher") {
+		let descriptionDiv;
+		let descriptionP;
+		if (mode == "afficher" || mode == "editDashboard") {
 			let headerDiv = document.getElementById("dashboard-name");
 			headerDiv.textContent = this.name;
-			const descriptionDiv = document.getElementById("dashboard-description");
-			const descriptionP = document.createElement("p");
+			descriptionDiv = document.getElementById("dashboard-description");
+			descriptionP = document.createElement("p");
 			descriptionP.textContent = this.description;
+			descriptionDiv.appendChild(descriptionP);
+		}
+		if (mode == "editDashboard") {
 			let editDescriptionBtn = document.createElement('button');
 			editDescriptionBtn.innerHTML = "Edit Description";
 			editDescriptionBtn.onclick = function() {
@@ -22,7 +27,6 @@ class Dashboard {
 				descriptionP.style.borderRadius = "5px";
 				descriptionP.addEventListener('blur', editDescription);
 			}
-			descriptionDiv.appendChild(descriptionP);
 			descriptionDiv.appendChild(editDescriptionBtn);
 		}
 		this.listeBlocks.map(blockData => {
@@ -138,8 +142,6 @@ class Variable {
 
     build(div, mode) {
 		const variableId = this.variableId;
-		const variableType = this.type;
-		const variableValue = this.value;
 		//conteneur "variable"
 		let conteneur = document.createElement('div');
 		conteneur.id = "var";

@@ -12,6 +12,39 @@ function afficherUsername() {
     });
 }
 
+function getDashboardList() {
+    axios.get('http://localhost:3000/user/dashboardList')
+    .then(response => {
+        const dashboardList = response.data.dashboardList;
+        const dashboardListElement = document.getElementById('dashboard-list');
+        
+        dashboardList.forEach(dashboardId => {
+            const dashboardListItem = document.createElement('li');
+            const dashboardLink = document.createElement('a');
+            dashboardLink.textContent = `Dashboard ${dashboardId}`;
+            dashboardLink.href = `/myDashboard?dashboardId=${dashboardId}`;
+            dashboardListItem.appendChild(dashboardLink);
+            let deleteDashboardBtn = document.createElement('button');
+            deleteDashboardBtn.innerHTML = "Delete Dashboard";
+            deleteDashboardBtn.onclick = function() {
+            axios.delete(`http://localhost:3000/dashboard/${dashboardId}`)
+                .then((res) => {
+                    console.log("Dashboard deleted");
+                    location.reload();
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+            }
+            dashboardListElement.appendChild(dashboardListItem);
+            dashboardListElement.appendChild(deleteDashboardBtn);
+        });
+    })
+    .catch(error => {
+        console.log(error);
+    });
+}
+
 function loadDashboard(id, mode) {    
     axios.get(`http://localhost:3000/dashboard/${id}`)
     .then(response => {
@@ -49,11 +82,40 @@ function loadBlock(id, mode) {
 }
 
 function editDescription(event) { 
-    //lets go 
+    const description = event.target;
+    newDescription = description.innerHTML;
+    axios.put(`http://localhost:3000/dashboardDescription/${window.id}`, {
+        description: newDescription,
+    })
+    .then((res) => {
+        console.log("Dashboard editted");
+        description.removeAttribute("contenteditable");
+        description.style.border = "none";
+    })
+    .catch((err) => {
+        console.error(err);
+    });
 }
 
 function editDashboardName(event) {
-    //lets go 
+    const titre = document.getElementById("dashboard-name");
+    titre.setAttribute("contenteditable", "true");
+    titre.style.border = "2px solid black";
+    titre.style.borderRadius = "5px";
+    titre.addEventListener('blur', function() {
+        const dashboardName = titre.innerText;
+        axios.put(`http://localhost:3000/dashboardName/${window.id}`, {
+            name: dashboardName,
+        })
+        .then((res) => {
+            console.log("Dashboard editted");
+            titre.removeAttribute("contenteditable");
+            titre.style.border = "none";
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+    });
 }
 
 function editBlockName(event) {
@@ -94,7 +156,6 @@ function editVariableName(event) {
 
 function sliderClicked(event) {
     const variableId = event.target.parentNode.parentNode.dataset.id;
-    console.log(variableId);
     let variableValue;
     if (event.target.checked) {
         variableValue = 1;
@@ -158,7 +219,6 @@ function dragAndDrop(mode) {
     });
 
     function updateOrder(start, end) {
-        console.log("start = ", start, " end = ", end)
         // Remove the moved item
         const movedItem = items[start];
         const parent = movedItem.parentElement;
@@ -172,7 +232,6 @@ function dragAndDrop(mode) {
         // Update the items array and itemIds
         items = Array.from(document.querySelectorAll(".edit-blockGround"));
         itemIds = Array.from(items, (item) => item.dataset.id);
-        console.log(itemIds);
     }
 }
 
@@ -186,7 +245,7 @@ function saveOrder(mode, id) {
         itemIds = Array.from(items, (item) => item.dataset.id);
     }
     if (mode == "dashboard") {
-        axios.put(`http://localhost:3000/dashboard/updateBlockOrder/${id}`, {
+        axios.put(`http://localhost:3000/updateBlockOrder/${id}`, {
             blockList: itemIds,
         })
         .then((res) => {

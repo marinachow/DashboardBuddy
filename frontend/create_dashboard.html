@@ -7,16 +7,20 @@
 	<link rel="stylesheet" href="/header">
 	<link rel="stylesheet" href="/style">
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>afficherUsername()</script>
 </head>
 <body>
 	<header>
-		<h1>Dashboard Buddy</h1>
-		<div class="user-button">
-			<form action="/user/logout" method="get">
-				<button class="user" type="submit">Log out</button>
-			</form>
-		</div>
-	</header>
+        <h1>Dashboard Buddy</h1>
+        <div id="user">
+            <div id="username"></div>
+            <div class="user-button">
+                <form action="/user/logout" method="get">
+                    <button class="user" type="submit">Log out</button>
+                </form>
+            </div>
+        </div>
+    </header>
 	<div class="second-header">
 		<h2>Create Dashboard</h2>
 	</div>
@@ -27,8 +31,8 @@
 		</div>
 		<br>
 		<div>
-			<label for="dashboard-description">Description:</label>
-			<textarea id="dashboard-description" name="dashboard-description"></textarea>
+			<label for="dashboard-description-textarea">Description:</label>
+			<textarea id="dashboard-description-textarea" name="dashboard-description-textarea"></textarea>
 		</div>
 		<br>
 		<button type="submit">Create Dashboard</button>

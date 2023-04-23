@@ -82,6 +82,12 @@ app.get("/editDashboard", requireAuth, (request, response) => {
     const filePath = path.join(__dirname, "../frontend/edit_dashboard.html");
     response.status(200).sendFile(filePath);
 });
+// Edit block list page
+app.get("/editBlockList", requireAuth, (request, response) => {
+    const id = request.query.id;
+    const filePath = path.join(__dirname, "../frontend/edit_block_list.html");
+    response.status(200).sendFile(filePath);
+});
 // CSS
 app.get("/style", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/style.css");
@@ -136,7 +142,6 @@ app.get('/user/logout', (req, res) => {
 
 app.get('/user', (req, res) => {
     if (req.session.loggedin) {
-        console.log(req.session.username);
 		res.send({ success : true, username: req.session.username});
 	} else {
 		res.status(401).send("Not logged in");
@@ -319,13 +324,11 @@ app.post("/dashboard/add", (req, res) => {
     }
 });
 
-app.put('/dashboard/edit/:id', (req, res) => {
+app.put('/dashboardName/:id', (req, res) => {
     const dashboardId = req.params.id;
 	const name = req.body.name;
-	const description = req.body.description;
-	const blockList = req.body.blockList;
-    const editDashboardSql = 'UPDATE dashboard SET name = ?, description = ?, block_list = ? WHERE id = ?';
-    pool.query(editDashboardSql, [name, description, JSON.stringify(blockList), dashboardId], (error, results) => {
+    const editDashboardSql = 'UPDATE dashboard SET name = ? WHERE id = ?';
+    pool.query(editDashboardSql, [name, dashboardId], (error, results) => {
         if (error) {
             console.log(error);
             res.send({success : false});
@@ -335,7 +338,21 @@ app.put('/dashboard/edit/:id', (req, res) => {
     });
 });
 
-app.put('/dashboard/updateBlockOrder/:id', (req, res) => {
+app.put('/dashboardDescription/:id', (req, res) => {
+    const dashboardId = req.params.id;
+	const description = req.body.description;
+    const editDashboardSql = 'UPDATE dashboard SET description = ? WHERE id = ?';
+    pool.query(editDashboardSql, [description, dashboardId], (error, results) => {
+        if (error) {
+            console.log(error);
+            res.send({success : false});
+        } else {
+            res.send({ success: true, dashboard: results[0] });
+        }
+    });
+});
+
+app.put('/updateBlockOrder/:id', (req, res) => {
     const dashboardId = req.params.id;
     const blockOrder = req.body.blockList;
     const newBlockOrder = blockOrder.map(Number);

@@ -5,53 +5,28 @@
     <title>Dashboard List</title>
     <link rel="stylesheet" href="/style">
     <link rel="stylesheet" href="/header">
+    <script src="functions.js" type="text/javascript"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>  
     <script>
-        // retrieve dashboard list from backend
-        axios.get('http://localhost:3000/user/dashboardList')
-        .then(response => {
-            const dashboardList = response.data.dashboardList;
-            const dashboardListElement = document.getElementById('dashboard-list');
-            
-            // create list items for each dashboard
-            dashboardList.forEach(dashboardId => {
-                const dashboardListItem = document.createElement('li');
-                const dashboardLink = document.createElement('a');
-                dashboardLink.textContent = `Dashboard ${dashboardId}`;
-                dashboardLink.href = `/myDashboard?dashboardId=${dashboardId}`;
-                dashboardListItem.appendChild(dashboardLink);
-                let deleteDashboardBtn = document.createElement('button');
-			    deleteDashboardBtn.innerHTML = "Delete Dashboard";
-                deleteDashboardBtn.onclick = function() {
-				axios.delete(`http://localhost:3000/dashboard/${dashboardId}`)
-					.then((res) => {
-						console.log("Dashboard deleted");
-						location.reload();
-					})
-					.catch((err) => {
-						console.error(err);
-					});
-			    }
-                dashboardListElement.appendChild(dashboardListItem);
-                dashboardListElement.appendChild(deleteDashboardBtn);
-            });
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        afficherUsername();
+        getDashboardList();
     </script>
 </head>
 <body>
     <header>
         <h1>Dashboard Buddy</h1>
-        <div class="user-button">
-            <form action="/user/logout" method="get">
-                <button class="user" type="submit">Log out</button>
-            </form>
+        <div id="user">
+            <div id="username"></div>
+            <div class="user-button">
+                <form action="/user/logout" method="get">
+                    <button class="user" type="submit">Log out</button>
+                </form>
+            </div>
         </div>
     </header>
     <div class="second-header">
         <h2>Dashboard List</h2>
+        <button onclick="window.location.href='/createDashboard'">Create Dashboard</button>
     </div>
     <ul id="dashboard-list"></ul>
 </body>
