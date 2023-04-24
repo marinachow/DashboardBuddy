@@ -11,7 +11,7 @@ variableForm.addEventListener('submit', async (event) => {
     let newVariableId;
 
     try {
-        const variableResponse = await axios.post('http://localhost:3000/variable/add', {
+        const variableResponse = await axios.post('http://localhost:3000/addVariable', {
             name: variableName,
 			type: variableType,
             value: variableValue,
@@ -20,7 +20,7 @@ variableForm.addEventListener('submit', async (event) => {
         console.log('Variable added');
         newVariableId = variableResponse.data.variableId;
 
-        await axios.put(`http://localhost:3000/block/addVariable/${blockId}`, {
+        await axios.put(`http://localhost:3000/addVariable/${blockId}`, {
             variableId: newVariableId
         });
         console.log('Variable added to block');
