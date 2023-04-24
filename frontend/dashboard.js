@@ -63,18 +63,21 @@ class Block {
 		//entête (qui contient le titre et éventuellement les boutons d'édition ou d'affichage du block)
 		let entete = document.createElement('div');
 		entete.className= "enteteblock";
+		entete.dataset.id = blockId;
 		blockGround.appendChild(entete);
 
 		//titre 
 		let titreblock = document.createElement('div');
 		titreblock.className = "titreblock";
 		titreblock.innerHTML = this.titre;
+		titreblock.dataset.id = blockId;
 		entete.appendChild(titreblock);
 
 		//block
 		let elem = document.createElement('div');
 		elem.className = "block";
 		elem.id = `block1`;
+		elem.dataset.id = blockId;
 		blockGround.appendChild(elem);
 
 		if (mode == "editBlock") {
@@ -109,24 +112,11 @@ class Block {
 			editVariableOrderBtn.onclick = function() {
 				window.location.href=`editBlock?blockId=${blockId}`;
 			}
-			for (let i = 0 ; i < this.listeVariables.length ; i++) {
-				let variable = this.listeVariables[i];
-				variable.build(elem);
-			};
-		} else if (mode == "editVariable") {
-			for (let i = 0 ; i < this.listeVariables.length ; i++) {
-				let variable = this.listeVariables[i];
-				variable.build(elem, "editVariable");
-			};
-		} else {
-			for (let i = 0 ; i < this.listeVariables.length ; i++) {
-				let variable = this.listeVariables[i];
-				variable.build(elem);
-			};
 		}
-		
-		
-
+		for (let i = 0 ; i < this.listeVariables.length ; i++) {
+			let variable = this.listeVariables[i];
+			variable.build(elem, mode);
+		};
 		//TODO ajouter le bouton qui permet d'ouvrir ou fermer le contenu		
     }
 };
@@ -157,6 +147,7 @@ class Variable {
 		let titre = document.createElement('div');
 		titre.innerHTML= this.titre;
 		titre.className = "titreVar"
+		titre.dataset.id = variableId;
 		conteneur.appendChild(titre);
 		
 		//input de la variable (selon le type : zone de texte ou bouton)
@@ -166,6 +157,7 @@ class Variable {
 			input.type = "text";
 			input.className = "inputVar";
 			input.value = this.value;
+			input.dataset.id = variableId;
 			if (mode == "editVariable") {
 				input.addEventListener('change', editVariableValue);
 			} else {
@@ -180,6 +172,7 @@ class Variable {
 			let span = document.createElement('span');
 			span.className = "slider round";
 			input2.checked = (this.value === "1");
+			input2.dataset.id = variableId;
 			input.appendChild(input2);
 			input.appendChild(span);
 			if (mode == "editVariable") {
@@ -221,7 +214,6 @@ class Variable {
 			}
 			div.appendChild(buttonContainer);
 		}
-
     }
 }
 module.exports = { Dashboard, Block, Variable };

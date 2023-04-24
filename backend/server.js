@@ -73,7 +73,7 @@ app.get("/createVariable", requireAuth, (request, response) => {
 });
 // Edit block page
 app.get("/editBlock", requireAuth, (request, response) => {
-    const filePath = path.join(__dirname, "../frontend/edit_block.html");
+    const filePath = path.join(__dirname, "../frontend/edit_variable_list.html");
     response.status(200).sendFile(filePath);
 });
 // Edit dashboard page
@@ -462,13 +462,14 @@ app.delete('/dashboard/:id', (req, res) => {
 app.get('/block/:id', (req, res) => {
     const blockId = req.params.id;
     const getBlockSql = 'SELECT * FROM block WHERE id = ?';
-    const getVariablesSql = 'SELECT * FROM variable WHERE block_id = ?';
     pool.query(getBlockSql, blockId, (error, results) => {
         if (error) {
             console.log(error);
             res.send({ success: false });
         } else {
             const block = results[0];
+            const variableIds = JSON.parse(block.variable_list);
+            const getVariablesSql = 'SELECT * FROM variable WHERE block_id = ? ORDER BY FIELD(id, ' + variableIds + ')';
             pool.query(getVariablesSql, blockId, (error, variablesResults) => {
                 if (error) {
                     console.log(error);
@@ -482,7 +483,7 @@ app.get('/block/:id', (req, res) => {
         }
     });
 });
-  
+
 app.post('/block/add', (req, res) => {
 	const { title, dashboardId, variableList } = req.body;
 	const addBlockSql = 'INSERT INTO block (title, dashboard_id, variable_list) VALUES (?, ?, ?)';
@@ -613,7 +614,7 @@ app.put('/block/addVariable/:id', (req, res) => {
     });
 });
 
-app.put('/block/updateVariableOrder/:id', (req, res) => {
+app.put('/updateVariableOrder/:id', (req, res) => {
     const blockId = req.params.id;
     const variableOrder = req.body.variableList;
     const newVariableOrder = variableOrder.map(Number);

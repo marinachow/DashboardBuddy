@@ -120,7 +120,7 @@ function editDashboardName(event) {
 
 function editBlockName(event) {
     const blockName = event.target;
-    const blockId = blockName.parentNode.parentNode.dataset.id;
+    const blockId = blockName.dataset.id;
     newBlockTitle = blockName.innerHTML;
     axios.put(`http://localhost:3000/blockName/${blockId}`, {
         title: newBlockTitle,
@@ -137,7 +137,7 @@ function editBlockName(event) {
 
 function editVariableName(event) {
     const variableName = event.target;
-    const variableId = variableName.parentNode.dataset.id;
+    const variableId = variableName.dataset.id;
     let newVariableTitle = variableName.innerHTML;
     axios.put(`http://localhost:3000/variableName/${variableId}`, {
         name: newVariableTitle
@@ -153,7 +153,7 @@ function editVariableName(event) {
 }
 
 function sliderClicked(event) {
-    const variableId = event.target.parentNode.parentNode.dataset.id;
+    const variableId = event.target.dataset.id;
     let variableValue;
     if (event.target.checked) {
         variableValue = 1;
@@ -173,7 +173,7 @@ function sliderClicked(event) {
 
 function editVariableValue(event) {
     const variableValue = event.target.value;
-    const variableId = event.target.parentNode.dataset.id;
+    const variableId = event.target.dataset.id;
     axios.put(`http://localhost:3000/variableValue/${variableId}`, {
             value: variableValue
         })
@@ -185,7 +185,6 @@ function editVariableValue(event) {
         });
 }
 
-let itemIds;
 function dragAndDrop(mode) {
     let items;
     if (mode == "dashboard") {
@@ -193,55 +192,52 @@ function dragAndDrop(mode) {
     } else if (mode == "block") {
         items = document.querySelectorAll(".edit-variable");
     }
-    let dragStartIndex;
-    let dragEndIndex;
-    items.forEach((item, index) => {
+    let dragged;
+    items.forEach((item) => {
         item.setAttribute('draggable', 'true');
-        item.addEventListener('dragstart', () => {
-            dragStartIndex = index;
-        });
-        item.addEventListener('dragover', (e) => {
+        item.ondragstart = (e) => {
+            dragged = item;
+            e.dataTransfer.setData('text/plain', item.innerHTML);
+            item.classList.add("dragged");
+        };
+      
+        item.ondragenter = () => {
+            if (!item.classList.contains("dragged")) {
+                item.classList.add('dropHover');
+            }
+            item.classList.remove('shake');
+        };
+      
+        item.ondragleave = () => {
+            item.classList.remove('dropHover');
+        };
+      
+        item.ondragend = () => {
+            item.classList.remove("dragged");
+        };
+      
+        item.ondragover = (e) => {
             e.preventDefault();
-        });
-        item.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            item.classList.add('drag-over');
-        });
-        item.addEventListener('dragleave', () => {
-            item.classList.remove('drag-over');
-        });
-        item.addEventListener('drop', () => {
-            dragEndIndex = index;
-            updateOrder(dragStartIndex, dragEndIndex);
-        });
+        };
+      
+        item.ondrop = (e) => {
+            dragged.innerHTML = item.innerHTML;
+            item.innerHTML = e.dataTransfer.getData('text/plain');
+            item.classList.remove('dropHover');
+            item.classList.add("shake");
+            e.dataTransfer.clearData();
+        };
     });
-
-    function updateOrder(start, end) {
-        // Remove the moved item
-        const movedItem = items[start];
-        const parent = movedItem.parentElement;
-        parent.removeChild(movedItem);
-
-        // Insert the moved item at the target position + 1
-        const targetIndex = end < start ? end : end + 1;
-        const targetItem = items[targetIndex];
-        parent.insertBefore(movedItem, targetItem);
-
-        items = Array.from(document.querySelectorAll(".edit-blockGround"));
-        itemIds = Array.from(items, (item) => item.dataset.id);
-    }
 }
 
 function saveOrder(mode, id) {
-    if (!itemIds) {
-        if (mode == "dashboard") {
-            items = document.querySelectorAll(".edit-blockGround");
-        } else if (mode == "block") {
-            items = document.querySelectorAll(".variable");
-        }
-        itemIds = Array.from(items, (item) => item.dataset.id);
-    }
+    const itemIds = [];
     if (mode == "dashboard") {
+        const enteteBlocks = document.querySelectorAll('.enteteblock');
+        for (let i = 0; i < enteteBlocks.length; i++) {
+            const dataId = enteteBlocks[i].getAttribute('data-id');
+            itemIds.push(dataId);
+        }
         axios.put(`http://localhost:3000/updateBlockOrder/${id}`, {
             blockList: itemIds,
         })
@@ -252,7 +248,12 @@ function saveOrder(mode, id) {
             console.error(err);
         })
     } else if (mode == "block") {
-        axios.put(`http://localhost:3000/block/updateVariableOrder/${id}`, {
+        const titreBlocks = document.querySelectorAll('.titreVar');
+        for (let i = 0; i < titreBlocks.length; i++) {
+            const dataId = titreBlocks[i].getAttribute('data-id');
+            itemIds.push(dataId);
+        }
+        axios.put(`http://localhost:3000/updateVariableOrder/${id}`, {
             variableList: itemIds,
         })
         .then((res) => {
