@@ -198,22 +198,6 @@ function dragAndDrop(mode) {
         item.ondragstart = (e) => {
             dragged = item;
             e.dataTransfer.setData('text/plain', item.innerHTML);
-            item.classList.add("dragged");
-        };
-      
-        item.ondragenter = () => {
-            if (!item.classList.contains("dragged")) {
-                item.classList.add('dropHover');
-            }
-            item.classList.remove('shake');
-        };
-      
-        item.ondragleave = () => {
-            item.classList.remove('dropHover');
-        };
-      
-        item.ondragend = () => {
-            item.classList.remove("dragged");
         };
       
         item.ondragover = (e) => {
@@ -223,8 +207,6 @@ function dragAndDrop(mode) {
         item.ondrop = (e) => {
             dragged.innerHTML = item.innerHTML;
             item.innerHTML = e.dataTransfer.getData('text/plain');
-            item.classList.remove('dropHover');
-            item.classList.add("shake");
             e.dataTransfer.clearData();
         };
     });
