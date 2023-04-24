@@ -12,6 +12,7 @@
 		afficherUsername();
         const params = new URLSearchParams(window.location.search);
         window.id = params.get('blockId');
+		const dashboardId = params.get('dashboardId');
         loadBlock(id, "editVariable");
     </script>
 </head>
@@ -53,6 +54,9 @@
 	<div id = "block-container">
         <div id="blockGround" class="blockGround"></div>
     </div>
+	<div class="view">
+		<button class="button" onclick="window.location.href=`/myDashboard?dashboardId=${dashboardId}`">View Dashboard</button>
+	</div>
 	<script src="createVariable.js" type="text/javascript" ></script>
 </body>
 </html>

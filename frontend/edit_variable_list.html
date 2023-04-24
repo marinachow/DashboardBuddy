@@ -17,6 +17,7 @@
     afficherUsername();
     const params = new URLSearchParams(window.location.search);
     window.id = params.get('blockId');
+    const dashboardId = params.get('dashboardId')
     loadBlock(window.id, "dragAndDrop");
 </script>
 
@@ -34,8 +35,8 @@
 </header>
 <body>
     <div class="second-header">
-        <h2>Edit Variable List</h2>
-        <button onclick="window.location.href=`/createVariable?blockId=${window.id}`">Add/Edit Variable</button>
+        <h2>Edit Order of Variables</h2>
+        <button onclick="window.location.href=`/createVariable?blockId=${window.id}&dashboardId=${dashboardId}`">Add/Edit Variable</button>
     </div>
     <div class="drag-instructions">
         Drag and drop to reorder the variables

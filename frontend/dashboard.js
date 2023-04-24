@@ -50,6 +50,7 @@ class Block {
 
     build(div, mode) {
 		const blockId = this.blockId;
+		const dashboardId = this.idDashboard;
 		//blockground (div qui contient le block et son entête)
 		let blockGround = document.createElement('div');
 		if (mode == "dragAndDrop"){
@@ -110,7 +111,7 @@ class Block {
 			editVariableOrderBtn.innerHTML = "Edit Variable Order";
 			entete.appendChild(editVariableOrderBtn);
 			editVariableOrderBtn.onclick = function() {
-				window.location.href=`editBlock?blockId=${blockId}`;
+				window.location.href=`editBlock?blockId=${blockId}&dashboardId=${dashboardId}`;
 			}
 		}
 		for (let i = 0 ; i < this.listeVariables.length ; i++) {

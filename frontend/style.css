@@ -200,3 +200,7 @@ input:checked + .slider:before {
 .documentation-link {
   padding : 20px;
 }
+
+.view {
+  padding : 20px;
+}
