@@ -80,7 +80,7 @@ blockForm.addEventListener('submit', async (event) => {
         console.log('Block added');
         newBlockId = blockResponse.data.blockId;
 
-        await axios.put(`http://localhost:3000/addBlock/${dashboardId}`, {
+        await axios.put(`http://localhost:3000/dashboard/addBlock/${dashboardId}`, {
             blockId: newBlockId
         });
         console.log('Block added to dashboard');
@@ -99,7 +99,7 @@ blockForm.addEventListener('submit', async (event) => {
             console.log('Variable added');
             newVariableId = variableResponse.data.variableId;
 
-            await axios.put(`http://localhost:3000/addVariable/${newBlockId}`, {
+            await axios.put(`http://localhost:3000/block/addVariable/${newBlockId}`, {
                 variableId: newVariableId
             });
             console.log('Variable added to block');

@@ -335,7 +335,7 @@ app.put('/updateBlockOrder/:id', (req, res) => {
     });
 });
 
-app.put('/addBlock/:id', (req, res) => {
+app.put('/dashboard/addBlock/:id', (req, res) => {
     const dashboardId = req.params.id;
     const blockId = parseInt(req.body.blockId);
     // Get the existing block list from the database
@@ -479,7 +479,7 @@ app.put('/blockName/:id', (req, res) => {
 	});
 });
 
-app.put('/addVariable/:id', (req, res) => {
+app.put('/block/addVariable/:id', (req, res) => {
     const blockId = req.params.id;
     const variableId = parseInt(req.body.variableId);
     // Get the existing variable list from the database
