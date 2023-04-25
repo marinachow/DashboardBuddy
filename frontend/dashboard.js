@@ -97,7 +97,7 @@ class Block {
 			deleteBlockBtn.innerHTML = "Delete Block";
 			entete.appendChild(deleteBlockBtn);
 			deleteBlockBtn.onclick = function() {
-				axios.delete(`http://localhost:3000/block/${blockId}`)
+				axios.delete(`${domain}/block/${blockId}`)
 					.then((res) => {
 						console.log("Block deleted");
 						location.reload();
@@ -204,7 +204,7 @@ class Variable {
 			deleteVariableBtn.innerHTML = "Delete Variable";
 			buttonContainer.appendChild(deleteVariableBtn);
 			deleteVariableBtn.onclick = function() {
-				axios.delete(`http://localhost:3000/variable/${variableId}`)
+				axios.delete(`${domain}/variable/${variableId}`)
 					.then((res) => {
 						console.log("Variable deleted");
 						location.reload();

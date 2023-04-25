@@ -73,14 +73,14 @@ blockForm.addEventListener('submit', async (event) => {
     let newBlockId;
 
     try {
-        const blockResponse = await axios.post('http://localhost:3000/addBlock', {
+        const blockResponse = await axios.post(`${domain}/addBlock`, {
             title: blockName,
 			dashboardId: dashboardId
         });
         console.log('Block added');
         newBlockId = blockResponse.data.blockId;
 
-        await axios.put(`http://localhost:3000/dashboard/addBlock/${dashboardId}`, {
+        await axios.put(`${domain}/dashboard/addBlock/${dashboardId}`, {
             blockId: newBlockId
         });
         console.log('Block added to dashboard');
@@ -90,7 +90,7 @@ blockForm.addEventListener('submit', async (event) => {
             const variableType = document.getElementsByName(`variable-${i}-type`)[0].value;
             const variableValue = document.getElementsByName(`variable-${i}-value`)[0].value;
 
-            const variableResponse = await axios.post('http://localhost:3000/addVariable', {
+            const variableResponse = await axios.post(`${domain}/addVariable`, {
                 name: variableName,
                 type: variableType,
                 value: variableValue,
@@ -99,7 +99,7 @@ blockForm.addEventListener('submit', async (event) => {
             console.log('Variable added');
             newVariableId = variableResponse.data.variableId;
 
-            await axios.put(`http://localhost:3000/block/addVariable/${newBlockId}`, {
+            await axios.put(`${domain}/block/addVariable/${newBlockId}`, {
                 variableId: newVariableId
             });
             console.log('Variable added to block');

@@ -1,5 +1,5 @@
 function afficherUsername() {
-    axios.get('http://localhost:3000/user')
+    axios.get(`${domain}/user`)
     .then(response => {
         let username = response.data.username;
         let div = document.getElementById("username");
@@ -13,7 +13,7 @@ function afficherUsername() {
 }
 
 function getDashboardList() {
-    axios.get('http://localhost:3000/user/dashboardList')
+    axios.get(`${domain}/user/dashboardList`)
     .then(response => {
         const dashboardList = response.data.dashboardList;
         const dashboardListElement = document.getElementById('dashboard-list');
@@ -27,7 +27,7 @@ function getDashboardList() {
             let deleteDashboardBtn = document.createElement('button');
             deleteDashboardBtn.innerHTML = "Delete Dashboard";
             deleteDashboardBtn.onclick = function() {
-            axios.delete(`http://localhost:3000/dashboard/${dashboardId}`)
+            axios.delete(`${domain}/dashboard/${dashboardId}`)
                 .then((res) => {
                     console.log("Dashboard deleted");
                     location.reload();
@@ -46,7 +46,7 @@ function getDashboardList() {
 }
 
 function loadDashboard(id, mode) {    
-    axios.get(`http://localhost:3000/dashboard/${id}`)
+    axios.get(`${domain}/dashboard/${id}`)
     .then(response => {
         const dashboardData = response.data.dashboard;
         const blockListData = response.data.blockList;
@@ -65,7 +65,7 @@ function loadDashboard(id, mode) {
 }
 
 function loadBlock(id, mode) {    
-    axios.get(`http://localhost:3000/block/${id}`)
+    axios.get(`${domain}/block/${id}`)
     .then(response => {
         let div = document.getElementById('blockGround');
         const blockData = response.data.block;
@@ -84,7 +84,7 @@ function loadBlock(id, mode) {
 function editDescription(event) { 
     const description = event.target;
     newDescription = description.innerHTML;
-    axios.put(`http://localhost:3000/dashboardDescription/${window.id}`, {
+    axios.put(`${domain}/dashboardDescription/${window.id}`, {
         description: newDescription,
     })
     .then((res) => {
@@ -104,7 +104,7 @@ function editDashboardName(event) {
     titre.style.borderRadius = "5px";
     titre.addEventListener('blur', function() {
         const dashboardName = titre.innerText;
-        axios.put(`http://localhost:3000/dashboardName/${window.id}`, {
+        axios.put(`${domain}/dashboardName/${window.id}`, {
             name: dashboardName,
         })
         .then((res) => {
@@ -122,7 +122,7 @@ function editBlockName(event) {
     const blockName = event.target;
     const blockId = blockName.dataset.id;
     newBlockTitle = blockName.innerHTML;
-    axios.put(`http://localhost:3000/blockName/${blockId}`, {
+    axios.put(`${domain}/blockName/${blockId}`, {
         title: newBlockTitle,
     })
     .then((res) => {
@@ -139,7 +139,7 @@ function editVariableName(event) {
     const variableName = event.target;
     const variableId = variableName.dataset.id;
     let newVariableTitle = variableName.innerHTML;
-    axios.put(`http://localhost:3000/variableName/${variableId}`, {
+    axios.put(`${domain}/variableName/${variableId}`, {
         name: newVariableTitle
     })
     .then((res) => {
@@ -160,7 +160,7 @@ function sliderClicked(event) {
     } else {
         variableValue = 0;
     }
-    axios.put(`http://localhost:3000/variableValue/${variableId}`, {
+    axios.put(`${domain}/variableValue/${variableId}`, {
             value: variableValue
         })
         .then((res) => {
@@ -174,7 +174,7 @@ function sliderClicked(event) {
 function editVariableValue(event) {
     const variableValue = event.target.value;
     const variableId = event.target.dataset.id;
-    axios.put(`http://localhost:3000/variableValue/${variableId}`, {
+    axios.put(`${domain}/variableValue/${variableId}`, {
             value: variableValue
         })
         .then((res) => {
@@ -220,7 +220,7 @@ function saveOrder(mode, id) {
             const dataId = enteteBlocks[i].getAttribute('data-id');
             itemIds.push(dataId);
         }
-        axios.put(`http://localhost:3000/updateBlockOrder/${id}`, {
+        axios.put(`${domain}/updateBlockOrder/${id}`, {
             blockList: itemIds,
         })
         .then((res) => {
@@ -235,7 +235,7 @@ function saveOrder(mode, id) {
             const dataId = titreBlocks[i].getAttribute('data-id');
             itemIds.push(dataId);
         }
-        axios.put(`http://localhost:3000/updateVariableOrder/${id}`, {
+        axios.put(`${domain}/updateVariableOrder/${id}`, {
             variableList: itemIds,
         })
         .then((res) => {

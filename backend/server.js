@@ -127,6 +127,10 @@ app.get("/create_dashboard.js", (request, response) => {
     const filePath = path.join(__dirname, "../frontend/create_dashboard.js");
     response.status(200).sendFile(filePath);
 });
+app.get("/origin.js", (request, response) => {
+    const filePath = path.join(__dirname, "../frontend/origin.js");
+    response.status(200).sendFile(filePath);
+});
 
 // Endpoints
 app.get('/user/logout', (req, res) => {
@@ -645,7 +649,7 @@ app.delete('/variable/:id', (req, res) => {
         }
     });
 });
-  
+
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
