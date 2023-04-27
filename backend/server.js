@@ -255,6 +255,21 @@ app.get('/dashboard/:id', (req, res) => {
     });
 });
 
+app.get('/dashboardName/:id', (req, res) => {
+    const dashboardId = req.params.id;
+    const getDashboardSql = 'SELECT * FROM dashboard WHERE id = ?';
+  
+    pool.query(getDashboardSql, dashboardId, (error, dashboardResults) => {
+        if (error) {
+            console.log(error);
+            res.send({ success: false });
+        } else {
+            const dashboard = dashboardResults[0];
+            res.send({ success: true, dashboardName : dashboard.name });
+        }
+    });
+});
+
 app.post("/addDashboard", (req, res) => { 
     if (req.session.loggedin) {
         const username = req.session.username;

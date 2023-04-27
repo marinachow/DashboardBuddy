@@ -159,11 +159,8 @@ class Variable {
 			input.className = "inputVar";
 			input.value = this.value;
 			input.dataset.id = variableId;
-			if (mode == "editVariable") {
-				input.addEventListener('change', editVariableValue);
-			} else {
-				input.disabled = true;
-			}
+			input.addEventListener('change', editVariableValue);
+			
       	} 
       	if (this.type=="button") {
 			input = document.createElement('label');
@@ -176,11 +173,8 @@ class Variable {
 			input2.dataset.id = variableId;
 			input.appendChild(input2);
 			input.appendChild(span);
-			if (mode == "editVariable") {
-				input.addEventListener('change', sliderClicked);
-			} else {
-				input2.disabled = true;
-			}
+			input.addEventListener('change', sliderClicked);
+			
       	} else { //TODO si la variable n'a pas de type texte ou button
 			input.innerHTML= "<input/>";
 			input.className = "inputVar";

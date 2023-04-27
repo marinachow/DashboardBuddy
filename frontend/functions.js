@@ -21,7 +21,14 @@ function getDashboardList() {
         dashboardList.forEach(dashboardId => {
             const dashboardListItem = document.createElement('li');
             const dashboardLink = document.createElement('a');
-            dashboardLink.textContent = `Dashboard ${dashboardId}`;
+            axios.get(`${domain}/dashboardName/${dashboardId}`)
+            .then(response => {
+                dashboardLink.textContent = `${response.data.dashboardName}`;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+            
             dashboardLink.href = `/myDashboard?dashboardId=${dashboardId}`;
             dashboardListItem.appendChild(dashboardLink);
             let deleteDashboardBtn = document.createElement('button');
@@ -198,6 +205,7 @@ function dragAndDrop(mode) {
         item.ondragstart = (e) => {
             dragged = item;
             e.dataTransfer.setData('text/plain', item.innerHTML);
+            console.log(item.innerHTML);
         };
       
         item.ondragover = (e) => {
