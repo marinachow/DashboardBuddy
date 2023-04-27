@@ -7,5 +7,5 @@ Comment lancer le projet :
 3. Ouvrir le projet et exécuter npm install dans le terminal.
 4. Exécuter la commande: .\tunnelto-windows.exe set-auth --key 17YIxABVdVrtjjAezDXGPO
 5. Exécuter la commande: .\tunnelto-windows.exe --subdomain dashboard-buddy --port 3000
-6. Se déplacer dans le dossier backend et exécuter npm run watch
-7. Ouvrir l'application web sur http://localhost:3000/ ou sur https://dashboard-buddy.tunnelto.dev.
+6. Dans un terminal à part, se déplacer dans le dossier backend et exécuter npm run watch
+7. Ouvrir l'application web sur http://localhost:3000/ ou sur https://dashboard-buddy.tunnel.talkr.ai/
