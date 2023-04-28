@@ -204,3 +204,7 @@ input:checked + .slider:before {
 .view {
   padding : 20px;
 }
+
+li {
+  font-size: xx-large;
+}
